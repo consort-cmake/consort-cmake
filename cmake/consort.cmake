@@ -1,0 +1,32 @@
+
+if(CONSORT_INCLUDED)
+	return()
+endif()
+
+set(CONSORT_INCLUDED 1)
+
+list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_LIST_DIR}")
+
+include("${CMAKE_CURRENT_LIST_DIR}/consort/init.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/consort/version.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/consort/platform.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/consort/options.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/consort/parse_args.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/consort/debug.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/consort/safe_glob.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/consort/flags.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/consort/yasm.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/consort/warnings.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/consort/configure.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/consort/common_args.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/consort/exe.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/consort/lib.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/consort/dll.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/consort/modules.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/consort/link.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/consort/runtime.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/consort/externals.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/consort/test.cmake")
+
+include("${CMAKE_CURRENT_LIST_DIR}/consort/boost.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/consort/qt.cmake")
