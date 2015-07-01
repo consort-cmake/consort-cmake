@@ -91,11 +91,11 @@ macro(co_enable_qt5)
 		endforeach()
 
 		# Some distributions don't find the SVG plugin correctly
-		if (Qt5Gui_FOUND AND NOT Qt5Gui_PLUGINS MATCHES ".*Qt5::QSvgPlugin.*")
+		if (Qt5Svg_FOUND AND NOT Qt5Svg_PLUGINS MATCHES ".*Qt5::QSvgPlugin.*")
 			add_library(Qt5::QSvgPlugin MODULE IMPORTED)
 			_populate_Gui_plugin_properties(QSvgPlugin RELEASE "imageformats/${CMAKE_SHARED_LIBRARY_PREFIX}qsvg${CMAKE_SHARED_LIBRARY_SUFFIX}")
 			_populate_Gui_plugin_properties(QSvgPlugin DEBUG "imageformats/${CMAKE_SHARED_LIBRARY_PREFIX}qsvg${CMAKE_SHARED_LIBRARY_SUFFIX}")
-			list(APPEND Qt5Gui_PLUGINS Qt5::QSvgPlugin)
+			list(APPEND Qt5Svg_PLUGINS Qt5::QSvgPlugin)
 		endif()
 
 		if(Qt5Core_FOUND)
