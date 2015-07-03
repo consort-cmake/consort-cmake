@@ -1,0 +1,182 @@
+
+<h2 class="md-headline">My First Consort Project</h2>
+<p>
+	Getting started with Consort is easy! The most basic consort project consists
+	of three commands in a CMakeLists.txt file.
+</p>
+<pre><code>
+cmake_minimum_required(VERSION 3.0.3)
+
+include("cmake/consort.cmake")
+
+co_exe( hello
+	sources: *.cpp
+)
+</code></pre>
+<p>
+	The first line is necessary to suppress CMake warnings, Consort will also
+	specify a minimum version based on the requirements of Consort's code - so the
+	version you specify isn't crucial if you're only using Consort's capabilities.
+</p>
+<p>
+	The second line is necessary to enable all the Consort functions for your
+	project. You should include consort.cmake in the top level CMakeLists.txt
+	for your build and before you do anything else (except set Consort
+	configuration variables) to make sure that Consort has a chance to do all
+	it's key initial set-up before anything else.
+</p>
+<p>
+	The last command is the Consort way to declare an executable target, unless
+	your project has some special requirements you should be able to specify all
+	the important properties of your target in a single call. See the
+	<a href="#/co_exe">co_exe</a> documentation for more details on the options
+	you can specify.
+</p>
+
+<h2 class="md-headline">Enabling Modules</h2>
+<p>
+	Using Consort's module support is slightly more complex, however, after a
+	few lines of set-up it's fairly straightforward to use. There are four
+	key elements of a modular build:
+	<ol>
+		<li>Declaring the modules</li>
+		<li>Finding modules</li>
+		<li>Activating modules</li>
+		<li>Including activated modules</li>
+	</ol>
+</p>
+<h3 class="md-title">Declaring Modules</h3>
+<p>
+	To create a module, put all the code for your module into a subdirectory,
+	together with a CMakeLists.txt that contains all the necessary (Consort)
+	declarations to build the module. You do not need to use <code>add_subdirectory</code>
+	to add the module to your build, Consort will call <code>add_subdirectory</code>
+	for you.
+</p>
+<p>
+	Next create a file called <code>module.cmake</code> in your module directory,
+	call <a href="#/co_module">co_module</a> and pass the name of your module.
+	Consort will include your <code>module.cmake</code> when searching for
+	modules.
+</p>
+<h3 class="md-title">Finding Modules</h3>
+<p>
+	In your top level CMakeLists.txt, add a call to
+	<a href="#/co_find_modules">co_find_modules</a> for each directory that
+	contains modules. Consort will search the subdirectories for a file called
+	<code>module.cmake</code> and include it, each <code>module.cmake</code>
+	file will register it's modules with Consort.
+</p>
+<h3 class="md-title">Activating Modules</h3>
+<p>
+	Once you've registered all your modules with Consort, you need to tell
+	Consort which ones to activate. There are two ways to do this, firstly link
+	any target (that is not itself in a module) to a module - Consort will
+	automatically activate the module. Secondly, you can call
+	<a href="#/co_require_module">co_require_module</a> to force Consort to
+	activate the module.
+</p>
+<h3 class="md-title">Including Activated Modules</h3>
+<p>
+	Lastly, you need to include activated modules. This normally needs to be
+	done in your top level CMakeLists.txt, so that the modules are always
+	added from a consistent location. To include activated modules simply
+	call <a href="#/co_include_modules">co_include_modules</a>
+</p>
+<h3 class="md-title">Putting It Together</h3>
+<p>
+	You should end up with a top-level CMakeLists.txt that looks a bit like this.
+</p>
+<pre><code>
+cmake_minimum_required(VERSION 3.0.3)
+include("${CMAKE_SOURCE_DIR}/../../cmake/consort.cmake")
+
+# Register all modules in the current directory
+co_find_modules(.)
+
+# Explicitly enable module1
+co_require_module(module1)
+
+#  Include activated modules
+co_include_modules()
+</code></pre>
+
+<h2 class="md-headline">Using Qt</h2>
+<p>
+	Using Qt is pretty easy. First you need to enable Qt with
+	<a href="#/consort_enable_qt5">consort_enable_qt5</a> or
+	<a href="#/consort_enable_default_qt5">consort_enable_default_qt5</a>.
+</p>
+<pre><code>
+consort_enable_default_qt()
+</code></pre>
+<p>
+	Then declare your targets as normal, add the
+	<a href="#/co_exe">gui</a> and <a href="#/CONSORT_COMMON_FLAGS">automoc</a>
+	flags to make a proper GUI application on Windows and have CMake
+	automatically run Qt's MOC on any files that require it.
+</p>
+<pre><code>
+co_exe( hello gui automoc
+	sources: *.cpp
+)
+</code></pre>
+<p>
+	Add ui-files to the <a href="#/CONSORT_COMMON_GROUPS">ui-sources</a> group
+	and any resource files to the <a href="#/CONSORT_COMMON_GROUPS">sources</a>
+	group and Consort will compile them into your target for you.
+</p>
+<pre><code>
+co_exe( hello gui automoc
+	sources:
+		*.cpp
+		resources/*.qrc
+	ui-sources:
+		ui/*.ui
+)
+</code></pre>
+<p>
+	Link to suitable Qt modules using the
+	<a href="#/CONSORT_COMMON_GROUPS">qt-modules</a> group.
+</p>
+<pre><code>
+co_exe( hello gui automoc
+	sources:
+		*.cpp
+		resources/*.qrc
+	ui-sources:
+		ui/*.ui
+	qt-modules:
+		Core
+		Gui
+		Widgets
+)
+</code></pre>
+<p>
+	Lastly, have Consort generate translation data and embed it into your target
+	as a resource using the
+	<a href="#/CONSORT_COMMON_GROUPS">translations</a> group.
+</p>
+<pre><code>
+co_exe( hello gui automoc
+	sources:
+		*.cpp
+		resources/*.qrc
+	ui-sources:
+		ui/*.ui
+	qt-modules:
+		Core
+		Gui
+		Widgets
+	translations:
+		en_GB.ts
+		fr.ts
+		de.ts
+)
+</code></pre>
+<p>
+	This will give you a fairly complete Qt target. See the
+	<a href="#/CONSORT_COMMON_GROUPS">CONSORT_COMMON_GROUPS</a> documentation
+	for more information on available options, and the qt5 example for details
+	on how to load the embedded translation files.
+</p>
