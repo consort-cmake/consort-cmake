@@ -1,0 +1,106 @@
+<p>
+	Consort CMake is a set of opinionated functions and macros for
+	<a href="http://www.cmake.org/">CMake</a> designed to make managing large
+	projects easier.
+</p>
+
+<h2 class="md-headline">Features</h2>
+
+<div layout="row">
+	<md-card flex="30">
+		<div style="text-align:center">
+			<i class="fa fa-code fa-5x"></i>
+		</div>
+		<md-card-content>
+			<h2 class="md-title">Declarative</h2>
+			<p class="md-caption">
+				The Consort syntax for creating targets is designed to look
+				"declarative", making it easier to read and remember how to
+				add new targets. Stop worrying about your build environment and
+				start focusing on your code!
+			</p>
+		</md-card-content>
+	</md-card>
+	<md-card flex="30">
+		<div style="text-align:center">
+			<i class="fa fa-tachometer fa-5x"></i>
+		</div>
+		<md-card-content>
+			<h2 class="md-title">YASM</h2>
+			<p class="md-caption">
+				Out-of-the-box support for YASM assembly makes it as painless as
+				possible to add ASM optimisations to your code that will behave
+				the same way regardless of the targeted compiler. Consort adds
+				plenty of convenience macros as well, so when your assembler
+				needs to know about the target platform you can easily use the
+				YASM preprocessor to switch on the appropriate instructions to
+				handle platform specific calling conventions.
+			</p>
+		</md-card-content>
+	</md-card>
+	<md-card flex="30">
+		<div style="text-align:center">
+			<i class="fa fa-desktop fa-5x"></i>
+		</div>
+		<md-card-content>
+			<h2 class="md-title">Qt</h2>
+			<p class="md-caption">
+				Out-of-the-box support for Qt makes it easy to incorporate Qt
+				into your build. Consort can find Qt for you, and perform much
+				of the configuration necessary to build Qt UI files, resources
+				and translations into your code.
+			</p>
+		</md-card-content>
+    </md-card>
+</div>
+
+<div layout="row">
+	<md-card flex="30">
+		<div style="text-align:center">
+			<i class="fa fa-rocket fa-5x"></i>
+		</div>
+		<md-card-content>
+			<h2 class="md-title">Boost</h2>
+			<p class="md-caption">
+				Out-of-the-box support for Boost means you can easily make use
+				of the boost libraries in your code. Consort will sanitise the
+				boost libraries as much as possible to make sure you have an
+				easy to use and consistent cross platform build.
+			</p>
+		</md-card-content>
+	</md-card>
+	<md-card flex="30">
+		<div style="text-align:center">
+			<i class="fa fa-gears fa-5x"></i>
+		</div>
+		<md-card-content>
+			<h2 class="md-title">Modules</h2>
+			<p class="md-caption">
+				Consort's built in module system makes it easy to share code,
+				without slowing down your build by introducing targets that
+				don't need to be built. Consort will automatically detect when
+				you link to a module, and include the CMake code necessary to
+				build that target. Plus, no more merge conflicts on the top
+				level CMakeLists.txt as it won't need updating as often.
+			</p>
+		</md-card-content>
+	</md-card>
+	<md-card flex="30">
+		<div style="text-align:center">
+			<i class="fa fa-ellipsis-h fa-5x"></i>
+		</div>
+		<md-card-content>
+			<h2 class="md-title">And more...</h2>
+			<p class="md-caption">
+				Consort includes numerous other options and default
+				configuration to help you get your project up and running faster,
+				including automatically setting suitable warning levels, adding
+				consistently named #defines for architecture and platform, and
+				tools to copy required resources to your build directory.
+			</p>
+		</md-card-content>
+	</md-card>
+</div>
+
+
+

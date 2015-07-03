@@ -1,6 +1,15 @@
+## Utilities/co_join
+# ```
 # co_join(output-variable glue list-item...)
+# ```
 #
 # Collapse list items into a string, joining them with the specified glue.
+#
+# Example:
+#
+#     set(LIST a b c)
+#     co_join(OUTPUT "," ${LIST})
+#     # OUTPUT = "a,b,c"
 #
 function( co_join var glue )
 	set(_val "")
@@ -16,10 +25,18 @@ function( co_join var glue )
 	set( ${var} "${_val}" PARENT_SCOPE )
 endfunction()
 
-# co_split(output-variable glue string...)
+## Utilities/co_split
+# ```
+# co_split(output-variable glue string)
+# ```
 #
-# Split one or more strings into lists using the specified glue character
+# Split a strings into a list using the specified glue character
 #
+# Example:
+#
+#     set(STRING "a,b,c")
+#     co_split(OUTPUT "," "${STRING}")
+#     # OUTPUT = "a;b;c"
 function( co_split var glue )
 	if( ARGN )
 		string(REPLACE "${glue}" ";" _val ${ARGN} )
@@ -29,10 +46,15 @@ function( co_split var glue )
 	endif()
 endfunction()
 
+## Utilities/co_remove_flags
+# ```
 # co_remove_flags(var flag...)
+# ```
 #
 # Remove all matching flags from the (space separated) list of flags in "var".
 #
+# Useful for manipulating CMake variables that contain command line flags, but
+# do not separate them into a standard CMake List.
 function( co_remove_flags var )
 	co_split(_flags " " "${${var}}")
 	list(LENGTH _flags _n)
@@ -43,12 +65,17 @@ function( co_remove_flags var )
 	endif()
 endfunction()
 
+## Utilities/co_add_flags
+# ```
 # co_add_flags(var flag...)
+# ```
 #
 # Add all matching flags to the (space separated) list of flags in "var".
 #
 # Existing duplicates will be removed.
 #
+# Useful for manipulating CMake variables that contain command line flags, but
+# do not separate them into a standard CMake List.
 function(co_add_flags var)
 	co_split(_flags " " "${${var}}")
 	list(LENGTH _flags _n)
@@ -62,10 +89,16 @@ function(co_add_flags var)
 	set( ${var} "${_flags}" PARENT_SCOPE )
 endfunction()
 
+## Utilities/co_replace_flags
+# ```
 # co_replace_flag(var old-flag new-flag)
+# ```
 #
-# Replace old_flag with new_flag in the (space separated) list of flags
+# Replace old_flag with new_flag in the (space separated) list of flags. The
+# position of the flag in the variable is not changed.
 #
+# Useful for manipulating CMake variables that contain command line flags, but
+# do not separate them into a standard CMake List.
 function( co_replace_flag var old_flag new_flag )
 	co_split(_flags " " "${${var}}")
 

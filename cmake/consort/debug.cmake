@@ -1,4 +1,7 @@
+## Utilities/co_debug
+# ```
 # co_debug(variable-name variable-name ...)
+# ```
 #
 # print the value of each listed variable
 function( co_debug )
@@ -8,7 +11,10 @@ function( co_debug )
 endfunction()
 
 
+## Utilities/co_stack_trace
+# ```
 # co_stack_trace()
+# ```
 #
 # print a stack trace
 function( co_stack_trace )

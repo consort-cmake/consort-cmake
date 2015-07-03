@@ -1,3 +1,28 @@
+## Build Targets/co_dll
+#
+# ```
+# co_dll(name groups... flags...)
+# ```
+#
+# Declare a shared library (DLL) target. The properties of the target are
+# specified in a declarative fashion as [groups](#/CONSORT_COMMON_GROUPS) and
+# [flags](#/CONSORT_COMMON_FLAGS). The most common groups you will need with
+# the `co_dll` function are the `sources:` group, for specifying source files,
+# and the `libraries:` group, for specifying libraries to link against.
+#
+# `co_dll` supports all the common groups and flags, consult the documentation
+# for [CONSORT_COMMON_GROUPS](#/CONSORT_COMMON_GROUPS) and
+# [CONSORT_COMMON_FLAGS](#/CONSORT_COMMON_FLAGS) for more information on the
+# available options.
+#
+# If you do not specify any source files, Consort will generate a dummy source
+# file to make the target into a "real" target. This can be used to specify
+# linker dependencies or for future proofing with header only libraries.
+#
+# Example:
+#
+#    co_dll( my_library sources: my_library.cpp libraries: ${Boost_DATE_TIME_LIBRARY})
+#
 function(co_dll name)
 	co_parse_args( THIS "${CONSORT_COMMON_GROUPS}" "${CONSORT_COMMON_FLAGS}" ${ARGN} )
 	set(THIS_NAME "${name}")

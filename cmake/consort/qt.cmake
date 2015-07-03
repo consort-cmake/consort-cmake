@@ -1,5 +1,22 @@
+## Externals/CONSORT_QT5_LOCATIONS
 # Define a list of directories to search for boost, Consort will automatically
 # add these directories to locations to search for Boost.
+#
+# By default, [co_enable_boost](#/co_enable_boost) searches the following locations:
+#
+### Windows
+# * c:/opt/qt5/${CONSORT_PLATFORM_NAME}
+# * c:/qt5/${CONSORT_PLATFORM_NAME}
+# * c:/opt/qt/${CONSORT_PLATFORM_NAME}
+# * c:/qt/${CONSORT_PLATFORM_NAME}
+# * c:/opt/qt
+# * c:/qt
+#
+### Linux and Mac OS X
+# * /opt/qt5/${CONSORT_PLATFORM_NAME}
+# * /opt/qt5
+# * /opt/qt/${CONSORT_PLATFORM_NAME}
+# * /opt/qt
 set(CONSORT_QT5_LOCATIONS "")
 if(CONSORT_WINDOWS)
 	list(APPEND CONSORT_QT5_LOCATIONS
@@ -20,10 +37,27 @@ if(CONSORT_LINUX OR CONSORT_MACOSX)
 	)
 endif()
 
-
+## Externals/co_enable_qt
+# ```
 # co_enable_qt(module module...)
+# ```
 #
-# Find and enable support for Qt5
+# Find and enable support for Qt5. You should specify the Qt modules you
+# want (in addition to Core). For example
+#
+# ```
+# co_enable_qt(Gui Widgets)
+# ```
+#
+# will find QtCore, QtGui and QtWidgets. Libraries can then be linked to targets
+# through the use of the [qt-modules](CONSORT_COMMON_GROUPS) group.
+#
+# Consort will automatically copy or symlink Qt binaries into the build (bin)
+# directory to ensure that Qt programs can be launched directly from the build
+# output. Consort also sets [CMAKE_AUTORCC](http://www.cmake.org/cmake/help/v3.3/variable/CMAKE_AUTORCC.html)
+# to enable automatic compilation of resources.
+#
+# If Qt is found, the `QT_FOUND` and `QT5_FOUND` flags will be set to 1.
 macro(co_enable_qt5)
 	if(NOT QT_ROOT)
 		if(CONSORT_GCC AND CONSORT_64BIT)
@@ -182,11 +216,33 @@ macro(co_enable_qt5)
 	endif()
 endmacro()
 
+## Externals/co_enable_default_qt5
+# ```
 # co_enable_default_qt5(module module...)
+# ```
 #
 # Find and enable support for Qt5. This macro will use the default list of
 # modules provided by Consort, you can add additional modules if necessary.
 #
+# The default modules are:
+#
+# * Gui
+# * Widgets
+# * Network
+# * WebKit
+# * WebKitWidgets
+# * WebChannel
+# * Sql
+# * Svg
+# * OpenGL
+# * Concurrent
+# * Multimedia
+# * PrintSupport
+# * MultimediaWidgets
+# * Positioning
+# * Qml
+# * Quick
+# * Sensors
 macro(co_enable_default_qt5)
 	co_enable_qt5(
 		Gui
@@ -210,11 +266,14 @@ macro(co_enable_default_qt5)
 	)
 endmacro()
 
+## Utilities/co_write_file_if_changed
+# ```
 # co_write_file_if_changed( filename content )
+# ```
 #
 # Ensure "filename" contains "content", but do not touch the file if it is not
 # necessary. Useful for generating output files, without triggering rebuilds
-# when cmake is run.
+# when cmake is run. Equivalent to `file(WRITE "${filename}" "${content}")`.
 #
 function( co_write_file_if_changed filename content )
 	if( EXISTS "${filename}" )
@@ -429,10 +488,26 @@ macro( QT_USE_MODULES )
 	endforeach()
 endmacro()
 
+## Externals/co_process_qt_args
+# ```
 # co_process_qt_args(target)
+# ```
 #
 # Adjust properties of target as necessary to add Qt support. Note that this
-# macro needs to be called before target is declared.
+# macro needs to be called before target is declared. This macro is analogous
+# to [co_process_common_args](#/co_process_common_args), but for Qt specific
+# functionality. This is normally called for you by Consort, however, you
+# can use it to process the common Qt arguments for your targets if necessary.
+#
+#     function(my_target name)
+#         co_parse_args(THIS "${CONSORT_COMMON_GROUPS}" "${CONSORT_COMMON_FLAGS}" ${ARGN})
+#
+#         co_safe_glob(THIS_SOURCES ${THIS_SOURCES})
+#         co_process_qt_args(${name})
+#         add_executable(${name} ${THIS_SOURCES} ${THIS_GENERATED_SOURCES})
+#
+#         co_process_common_args(${name})
+#     endfunction()
 #
 macro(co_process_qt_args target)
 	set(THIS_TRANSLATION_SOURCES

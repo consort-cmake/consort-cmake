@@ -4,7 +4,7 @@ include("${CMAKE_SOURCE_DIR}/../../cmake/consort.cmake")
 co_enable_default_qt5()
 
 
-co_exe( hello gui
+co_exe( hello gui automoc
 	sources: *.cpp
 	ui-sources: *.ui
 	translations:

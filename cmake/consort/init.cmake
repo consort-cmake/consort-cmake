@@ -10,12 +10,6 @@ endif()
 # step, which causes CMake's compiler detection to fail.
 set(ENV{CGCC_FORCE_COLOR} 0)
 
-# In-source builds pollute the source tree with build artefacts and prevent
-# multiple build trees (for example for cross-compilation) from being associated
-# with a single source tree. You usually don't want this, so by default consort
-# disables them. If you must you can set CONSORT_PERMIT_INSOURCE_BUILDS to ON
-# before including consort.cmake to permit in-source builds.
-
 if(NOT CONSORT_PERMIT_INSOURCE_BUILDS)
 	string(COMPARE EQUAL "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}" _insource)
 
@@ -34,9 +28,6 @@ if(NOT CONSORT_PERMIT_INSOURCE_BUILDS)
 		)
 	endif()
 endif()
-
-# Builds on NFS partitions will be slow, consort stops you from doing it by
-# default. You can set CONSORT_PERMIT_NFS_BUILDS to ON to enable it.
 
 if( CMAKE_HOST_UNIX )
 	if( APPLE )

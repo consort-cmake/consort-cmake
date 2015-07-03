@@ -6,6 +6,9 @@ if(CONSORT_ENABLE_ASM)
 	endif()
 endif()
 
+## Variables/CONSORT_ASM_ENABLED
+# Set to 1 if [CONSORT_ENABLE_ASM](#/CONSORT_ENABLE_ASM) is set and yasm was
+# found, otherwise set to 0.
 if(CONSORT_ENABLE_ASM AND CMAKE_ASM_YASM_COMPILER_WORKS)
 	set(CONSORT_ASM_ENABLED 1)
 else()
@@ -17,6 +20,18 @@ if(CONSORT_MACOSX OR CONSORT_WINDOWS_X86)
 	co_add_flags(CMAKE_ASM_YASM_FLAGS --prefix=_)
 endif()
 
+## Utilities/co_add_asm_dependencies
+# ```
+# co_add_asm_dependencies(file file...)
+# ```
+#
+# Scan input ASM files for dependencies and set the
+# [OBJECT_DEPENDS](http://www.cmake.org/cmake/help/v3.3/prop_sf/OBJECT_DEPENDS.html)
+# property to ensure rebuilds are triggered as necessary.
+#
+# Due to limitations of CMake, Consort will not scan for new dependencies when
+# files change - so it may be necessary to re-run cmake occasionally to trigger
+# proper rebuilds.
 function(co_add_asm_dependencies)
 	get_directory_property(_defs_list COMPILE_DEFINITIONS)
 	set(_defs "")

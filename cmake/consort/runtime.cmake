@@ -1,6 +1,12 @@
+## Utilities/co_runtime_dll
+# ```
 # co_runtime_dll(file file...)
+# ```
 #
-# Copy DLLs required at runtime to the bin folder.
+# Copy DLLs required at runtime to the bin folder. On Windows in particular,
+# it may be necessary to have DLLs in the same folder as the compiled binaries
+# in order for the loader to find them. This routine automatically copies the
+# files passed as arguments to all of the runtime output directories.
 function(co_runtime_dll)
 	if( CO_MULTICONFIG_BUILD )
 		set( _dirs
@@ -24,11 +30,18 @@ function(co_runtime_dll)
 	endif()
 endfunction()
 
+## Utilities/co_runtime_link
+# ```
 # co_runtime_link(target linkname)
+# ```
 #
 # Link the "target" file or directory as "linkname" in each of the runtime
-# output locations. Unlike co_link, this will create multiple links for CMake
-# generators that support multiple build configurations.
+# output locations. Unlike [co_link](#/co_link), this will create multiple links
+# for CMake generators that support multiple build configurations.
+#
+# This is useful for linking resources such as data files or plugins into the
+# build directory so the build directory can emulate an installed version of the
+# software.
 function(co_runtime_link target linkname)
 	if( CO_MULTICONFIG_BUILD )
 		set( _dirs

@@ -6,26 +6,29 @@ if(CONSORT_VALGRIND_TESTS)
 	endif()
 endif()
 
-# co_test(
-#    target-name arg arg...
-#    command: ...
-#    working-directory: ...
-#    configurations: ...
-#    suppressions: ...
-#    no-valgrind
-# )
+## Build Targets/co_test
 #
-# Mark target-name as a test suite for ctest to run. The configurations option
+#     co_test(
+#        target-name arg arg...
+#        command: ...
+#        working-directory: ...
+#        configurations: ...
+#        suppressions: ...
+#        no-valgrind
+#     )
+#
+# Mark target-name as a test suite for ctest to run. The `configurations` group
 # can be used to indicate the test should only be run for particular build
-# configurations. The suppressions option can be used to add suppression files
-# when the test is run under valgrind and the no-valgrind option can be used
+# configurations. The `suppressions` group can be used to add suppression files
+# when the test is run under valgrind and the `no-valgrind` flag can be used
 # to indicate the test should not be run under valgrind.
 #
-# The command option can be used to run the test within a specific environment,
+# The `command` group can be used to run the test within a specific environment,
 # e.g. under xvfb for test suites that require an X frame buffer but need to be
-# able to run headless.
+# able to run headless. The `command` group is prefixed to the command used to
+# run the test.
 #
-# The working-directory option can be used to specify a working directory for
+# The `working-directory` option can be used to specify a working directory for
 # the test.
 function( co_test name )
 	co_parse_args( THIS "configurations;suppressions;command;working-directory" "no-valgrind" ${ARGN} )

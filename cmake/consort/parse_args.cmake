@@ -1,12 +1,22 @@
+## Utilities/co_var_name
+# ```
+# co_var_name(outvar name)
+# ```
+#
 # Convert a "name" to a sensible variable name by making it upper case and
 # replacing special characters with underscores.
-function( co_var_name outvar var )
-	string( TOUPPER "${var}" _out )
+function( co_var_name outvar name )
+	string( TOUPPER "${name}" _out )
 	string(REGEX REPLACE "[^A-Z0-9_]" "_" _out "${_out}")
 	set("${outvar}" "${_out}" PARENT_SCOPE)
 endfunction()
 
-# Determine if the list "list" contains the value "value" and set "variable"
+## Utilities/co_list_contains
+# ```
+# co_list_contains(list-variable-name value variable)
+# ```
+#
+# Determine if the list `${list-variable-name}` contains `value` and set `${variable}`
 # to 1 or 0 appropriately.
 function( co_list_contains list value variable )
 	set(_l ${list})
@@ -18,9 +28,12 @@ function( co_list_contains list value variable )
 	endif()
 endfunction()
 
+## Utilities/co_parse_args
 # Generic argument parsing macro
 #
-# co_parse_args(prefix "group name;group name;..." "flag name; flag name;..." arguments...)
+# ```
+# co_parse_args(prefix "group name;group name;..." "flag name;flag name;..." arguments...)
+# ```
 #
 # Scan "arguments" looking for "flags" (i.e. an exact match for anything in the
 # list of flags) or "groups" (anything in the list of group names followed by a
@@ -29,18 +42,17 @@ endfunction()
 # For each flag, this function will set a variable in the parent scope to ON or
 # OFF depending on whether the flag is defined. The variable will be an
 # upper-cased version of the flag name, with the specified prefix. Special
-# characters are replaced with an underscore.
+# characters are replaced with an underscore (see [co_var_name](#/co_var_name)).
 #
 # For each group, this function will set a variable in the parent scope to a
 # list of all the items that follow the group name. The variable will be an
 # upper-cased version of the flag name, with the specified prefix. Special
-# characters are replaced with an underscore.
+# characters are replaced with an underscore (see [co_var_name](#/co_var_name)).
 #
 # Arguments that are not a flag and occur outside of a group are added to the
 # ${prefix}_ARGN variable.
 #
 # Group and flag names are case sensitive!
-
 function( co_parse_args prefix group_names flag_names )
 
 	foreach( group_name ${group_names} )

@@ -41,12 +41,6 @@ endif()
 # step, which causes CMake's compiler detection to fail.
 set(ENV{CGCC_FORCE_COLOR} 0)
 
-# In-source builds pollute the source tree with build artefacts and prevent
-# multiple build trees (for example for cross-compilation) from being associated
-# with a single source tree. You usually don't want this, so by default consort
-# disables them. If you must you can set CONSORT_PERMIT_INSOURCE_BUILDS to ON
-# before including consort.cmake to permit in-source builds.
-
 if(NOT CONSORT_PERMIT_INSOURCE_BUILDS)
 	string(COMPARE EQUAL "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}" _insource)
 
@@ -65,9 +59,6 @@ if(NOT CONSORT_PERMIT_INSOURCE_BUILDS)
 		)
 	endif()
 endif()
-
-# Builds on NFS partitions will be slow, consort stops you from doing it by
-# default. You can set CONSORT_PERMIT_NFS_BUILDS to ON to enable it.
 
 if( CMAKE_HOST_UNIX )
 	if( APPLE )
@@ -115,14 +106,44 @@ enable_testing()
 # Allows include paths to be specified relative to the source root
 include_directories(${CMAKE_SOURCE_DIR})
 
+## Variables/CONSORT_VERSION
+# Contains the current version of Consort
 set(CONSORT_VERSION 0.1.1)
 # 32/64 bit detection
+## Variables/CONSORT_64BIT
+# This variable is 1 if `sizeof(void*) >= 8`.
 if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
 	set(CONSORT_64BIT 1)
 	add_definitions(-DCONSORT_64BIT=1)
 endif()
 
 # Compiler detection
+
+## Variables/CONSORT_GCC
+# Set to 1 if Consort detects the compiler is GCC (or similar).
+#
+# In addition, Consort will set the variables `CONSORT_GCC_40`, `CONSORT_GCC_41`
+# `CONSORT_GCC_42`, `CONSORT_GCC_43`, `CONSORT_GCC_44`, `CONSORT_GCC_45`,
+# `CONSORT_GCC_46`, `CONSORT_GCC_47`, `CONSORT_GCC_48`, and `CONSORT_GCC_49` if
+# the GCC version is *greater than or equal to* the appropriate version.
+
+## Variables/CONSORT_MSVC
+# Set to 1 if Consort detects the compiler is MSVC.
+#
+# In addition, Consort will set `CONSORT_MSVC_2010` if the compiler is MSVC 2010,
+# `CONSORT_MSVC_2012` if the compiler is MSVC 2012, and `CONSORT_MSVC_2013` if
+# the compiler is MSVC 2013.
+
+## Variables/CONSORT_CLANG
+# Set to 1 if Consort detects the compiler is Clang.
+
+## Variables/CONSORT_COMPILER_NAME
+# * Set to gcc for GCC
+# * Set to vs2010 for MSVC 2010
+# * Set to vs2012 for MSVC 2012
+# * Set to vs2013 for MSVC 2013
+# * set to clang for Clang
+
 if( CMAKE_COMPILER_IS_GNUCC )
 	set( CONSORT_GCC 1 )
 	set( CONSORT_COMPILER_NAME gcc )
@@ -167,19 +188,62 @@ if( APPLE AND NOT CONSORT_CLANG )
 		"then delete/regenerate your CMakeFiles and CMakeCache.txt.")
 endif()
 
+## Variables/CONSORT_MULTICONFIG_BUILD
 # Some generators support multiple build configurations, this helps you detect
-# that and adjust appropriately.
+# that and adjust appropriately. Set to 1 if the generator supports multiple
+# build configurations.
 if( NOT CMAKE_CFG_INTDIR STREQUAL "." )
 	set( CONSORT_MULTICONFIG_BUILD 1 )
 endif()
 
+## Variables/CONSORT_DEBUG_BUILD
+# Set to 1 if the build type contains debug information
+# ([CMAKE_BUILD_TYPE](http://www.cmake.org/cmake/help/v3.3/variable/CMAKE_BUILD_TYPE.html)
+# is Debug or RelWithDebInfo). Not set for generators that support multiple
+# build configurations (see [CONSORT_MULTICONFIG_BUILD](#/CONSORT_MULTICONFIG_BUILD)).
 if( NOT CONSORT_MULTICONFIG_BUILD )
 	if( CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo" )
 		set( CONSORT_DEBUG_BUILD 1 )
 	endif()
 endif()
 
-# Platform
+# Platform detection
+
+## Variables/CONSORT_WINDOWS
+# Set to 1 if consort detects the build target is Windows. Also adds
+# `-DCONSORT_WINDOWS=1` to the compile definitions.
+#
+# In addition CONSORT_WINDOWS_X86_64 will be defined as a CMake variable and
+# preprocessor definition if [CONSORT_64BIT](#/CONSORT_64BIT) is set. Otherwise
+# CONSORT_WINDOWS_X86 will be defined as a CMake variable and preprocessor
+# definition.
+
+## Variables/CONSORT_MACOSX
+# Set to 1 if consort detects the build target is Mac OS X. Also adds
+# `-DCONSORT_MACOSX=1` to the compile definitions.
+#
+# In addition CONSORT_MACOSX_X86_64 will be defined as a CMake variable and
+# preprocessor definition if [CONSORT_64BIT](#/CONSORT_64BIT) is set. Otherwise
+# CONSORT_MACOSX_X86 will be defined as a CMake variable and preprocessor
+# definition.
+
+## Variables/CONSORT_LINUX
+# Set to 1 if consort detects the build target is Linux. Also adds
+# `-DCONSORT_LINUX=1` to the compile definitions.
+#
+# In addition CONSORT_LINUX_X86_64 will be defined as a CMake variable and
+# preprocessor definition if [CONSORT_64BIT](#/CONSORT_64BIT) is set. Otherwise
+# CONSORT_LINUX_X86 will be defined as a CMake variable and preprocessor
+# definition.
+
+## Variables/CONSORT_PLATFORM_NAME
+# * windows-x86_64 for 64 bit Windows
+# * windows-x86 for 32 bit Windows
+# * macosx-x86_64 for 64 bit Mac OS X
+# * macosx-x86 for 32 bit Mac OS X
+# * linux-x86_64 for 64 bit Linux
+# * linux-x86 for 32 bit Linux
+
 if( WIN32 )
 	set( CONSORT_WINDOWS 1 )
 	add_definitions(-DCONSORT_WINDOWS=1)
@@ -229,13 +293,47 @@ endif()
 # options for configuring consort, override these settings before you include
 # consort.cmake or on the command line
 
+
+## Configuration/CONSORT_ENABLE_ASM
+# Enable yasm support, if yasm is found any targets which use `asm-sources` will
+# use the assembler rather than the generic sources. Set to OFF to prevent the
+# assembler being used even if yasm is found. Defaults to ON.
 option(CONSORT_ENABLE_ASM "Enable assembler" ON)
+
+## Configuration/CONSORT_REQUIRE_ASM
+# Require yasm to build (if [CONSORT_ENABLE_ASM](#/CONSORT_ENABLE_ASM) is ON).
+# If yasm is not found and  [CONSORT_ENABLE_ASM](#/CONSORT_ENABLE_ASM) is ON
+# Consort will error. Defaults to OFF.
 option(CONSORT_REQUIRE_ASM "Require assembler (if enabled)" OFF)
+
+## Configuration/CONSORT_PERMIT_INSOURCE_BUILDS
+# In-source builds pollute the source tree with build artefacts and prevent
+# multiple build trees (for example for cross-compilation) from being associated
+# with a single source tree. You usually don't want this, so by default consort
+# disables them. If you must you can set CONSORT_PERMIT_INSOURCE_BUILDS to ON
+# before including consort.cmake to permit in-source builds.
 option(CONSORT_PERMIT_INSOURCE_BUILDS "Enable in-source builds" OFF)
+
+## Configuration/CONSORT_PERMIT_NFS_BUILDS
+# Builds on NFS partitions will be slow, consort stops you from doing it by
+# default. You can set CONSORT_PERMIT_NFS_BUILDS to ON to enable it.
 option(CONSORT_PERMIT_NFS_BUILDS "Enable network builds" OFF)
+
+## Configuration/CONSORT_SUPPORT_WINDOWS_XP
+# Visual Studio 2013 and later use a version of the Windows runtime incompatible
+# with Windows XP. Set this flag to ON to cause them to use an earlier version
+# compatible with XP. Defaults to OFF.
 option(CONSORT_SUPPORT_WINDOWS_XP "Enable support for Windows XP" OFF)
+
+## Configuration/CONSORT_VALGRIND_TESTS
+# Run tests added with [co_test](#/co_test) to be run under valgrind. Useful for
+# detecting invalid memory accesses and leaks in test cases.
 option(CONSORT_VALGRIND_TESTS "Run tests under valgrind on supported platforms" OFF)
 
+## Configuration/CONSORT_CXX11
+# Enable C++11 support. Set to ON to set the necessary options and compiler flags
+# to enable C++11 code. Defaults to OFF, except on OS X Mavericks and later,
+# where it defaults to ON.
 if( CONSORT_MACOSX AND CONSORT_CLANG AND CMAKE_SYSTEM_VERSION VERSION_GREATER 12 )
 	# For modern versions of OSX default C++11 on to ensure we link to the right
 	# C++ runtime.
@@ -244,17 +342,29 @@ else()
 	option(CONSORT_CXX11 "Enable support for C++11" OFF)
 endif()
 
-# Global variable
+## Configuration/CONSORT_VALGRIND_SUPPRESSIONS
+# List of suppression files to pass to valgrind when [CONSORT_VALGRIND_TESTS](#/CONSORT_VALGRIND_TESTS)
+# is ON.
 set(CONSORT_VALGRIND_SUPPRESSIONS "" CACHE STRING "List of suppression files to use with valgrind" )
+## Utilities/co_var_name
+# ```
+# co_var_name(outvar name)
+# ```
+#
 # Convert a "name" to a sensible variable name by making it upper case and
 # replacing special characters with underscores.
-function( co_var_name outvar var )
-	string( TOUPPER "${var}" _out )
+function( co_var_name outvar name )
+	string( TOUPPER "${name}" _out )
 	string(REGEX REPLACE "[^A-Z0-9_]" "_" _out "${_out}")
 	set("${outvar}" "${_out}" PARENT_SCOPE)
 endfunction()
 
-# Determine if the list "list" contains the value "value" and set "variable"
+## Utilities/co_list_contains
+# ```
+# co_list_contains(list-variable-name value variable)
+# ```
+#
+# Determine if the list `${list-variable-name}` contains `value` and set `${variable}`
 # to 1 or 0 appropriately.
 function( co_list_contains list value variable )
 	set(_l ${list})
@@ -266,9 +376,12 @@ function( co_list_contains list value variable )
 	endif()
 endfunction()
 
+## Utilities/co_parse_args
 # Generic argument parsing macro
 #
-# co_parse_args(prefix "group name;group name;..." "flag name; flag name;..." arguments...)
+# ```
+# co_parse_args(prefix "group name;group name;..." "flag name;flag name;..." arguments...)
+# ```
 #
 # Scan "arguments" looking for "flags" (i.e. an exact match for anything in the
 # list of flags) or "groups" (anything in the list of group names followed by a
@@ -277,18 +390,17 @@ endfunction()
 # For each flag, this function will set a variable in the parent scope to ON or
 # OFF depending on whether the flag is defined. The variable will be an
 # upper-cased version of the flag name, with the specified prefix. Special
-# characters are replaced with an underscore.
+# characters are replaced with an underscore (see [co_var_name](#/co_var_name)).
 #
 # For each group, this function will set a variable in the parent scope to a
 # list of all the items that follow the group name. The variable will be an
 # upper-cased version of the flag name, with the specified prefix. Special
-# characters are replaced with an underscore.
+# characters are replaced with an underscore (see [co_var_name](#/co_var_name)).
 #
 # Arguments that are not a flag and occur outside of a group are added to the
 # ${prefix}_ARGN variable.
 #
 # Group and flag names are case sensitive!
-
 function( co_parse_args prefix group_names flag_names )
 
 	foreach( group_name ${group_names} )
@@ -324,7 +436,10 @@ function( co_parse_args prefix group_names flag_names )
 	endforeach()
 
 endfunction()
+## Utilities/co_debug
+# ```
 # co_debug(variable-name variable-name ...)
+# ```
 #
 # print the value of each listed variable
 function( co_debug )
@@ -334,7 +449,10 @@ function( co_debug )
 endfunction()
 
 
+## Utilities/co_stack_trace
+# ```
 # co_stack_trace()
+# ```
 #
 # print a stack trace
 function( co_stack_trace )
@@ -343,10 +461,14 @@ function( co_stack_trace )
 		message("  ${l}")
 	endforeach()
 endfunction()
+## Utilities/co_safe_glob
+# ```
 # co_safe_glob( output_var glob glob ...)
+# ```
 #
 # Expand file globs into output_var, generating an error if any glob files to
-# expand to any files.
+# expand to any files. Analogous to `file(GLOB ${var} ${ARGN})` but with a
+# sanity check to ensure each glob matches at least one file.
 #
 function( co_safe_glob var )
 	set( _out "" )
@@ -361,9 +483,18 @@ function( co_safe_glob var )
 	endforeach()
 	set( "${var}" ${_out} PARENT_SCOPE )
 endfunction()
+## Utilities/co_join
+# ```
 # co_join(output-variable glue list-item...)
+# ```
 #
 # Collapse list items into a string, joining them with the specified glue.
+#
+# Example:
+#
+#     set(LIST a b c)
+#     co_join(OUTPUT "," ${LIST})
+#     # OUTPUT = "a,b,c"
 #
 function( co_join var glue )
 	set(_val "")
@@ -379,10 +510,18 @@ function( co_join var glue )
 	set( ${var} "${_val}" PARENT_SCOPE )
 endfunction()
 
-# co_split(output-variable glue string...)
+## Utilities/co_split
+# ```
+# co_split(output-variable glue string)
+# ```
 #
-# Split one or more strings into lists using the specified glue character
+# Split a strings into a list using the specified glue character
 #
+# Example:
+#
+#     set(STRING "a,b,c")
+#     co_split(OUTPUT "," "${STRING}")
+#     # OUTPUT = "a;b;c"
 function( co_split var glue )
 	if( ARGN )
 		string(REPLACE "${glue}" ";" _val ${ARGN} )
@@ -392,10 +531,15 @@ function( co_split var glue )
 	endif()
 endfunction()
 
+## Utilities/co_remove_flags
+# ```
 # co_remove_flags(var flag...)
+# ```
 #
 # Remove all matching flags from the (space separated) list of flags in "var".
 #
+# Useful for manipulating CMake variables that contain command line flags, but
+# do not separate them into a standard CMake List.
 function( co_remove_flags var )
 	co_split(_flags " " "${${var}}")
 	list(LENGTH _flags _n)
@@ -406,12 +550,17 @@ function( co_remove_flags var )
 	endif()
 endfunction()
 
+## Utilities/co_add_flags
+# ```
 # co_add_flags(var flag...)
+# ```
 #
 # Add all matching flags to the (space separated) list of flags in "var".
 #
 # Existing duplicates will be removed.
 #
+# Useful for manipulating CMake variables that contain command line flags, but
+# do not separate them into a standard CMake List.
 function(co_add_flags var)
 	co_split(_flags " " "${${var}}")
 	list(LENGTH _flags _n)
@@ -425,10 +574,16 @@ function(co_add_flags var)
 	set( ${var} "${_flags}" PARENT_SCOPE )
 endfunction()
 
+## Utilities/co_replace_flags
+# ```
 # co_replace_flag(var old-flag new-flag)
+# ```
 #
-# Replace old_flag with new_flag in the (space separated) list of flags
+# Replace old_flag with new_flag in the (space separated) list of flags. The
+# position of the flag in the variable is not changed.
 #
+# Useful for manipulating CMake variables that contain command line flags, but
+# do not separate them into a standard CMake List.
 function( co_replace_flag var old_flag new_flag )
 	co_split(_flags " " "${${var}}")
 
@@ -453,6 +608,9 @@ if(CONSORT_ENABLE_ASM)
 	endif()
 endif()
 
+## Variables/CONSORT_ASM_ENABLED
+# Set to 1 if [CONSORT_ENABLE_ASM](#/CONSORT_ENABLE_ASM) is set and yasm was
+# found, otherwise set to 0.
 if(CONSORT_ENABLE_ASM AND CMAKE_ASM_YASM_COMPILER_WORKS)
 	set(CONSORT_ASM_ENABLED 1)
 else()
@@ -464,6 +622,18 @@ if(CONSORT_MACOSX OR CONSORT_WINDOWS_X86)
 	co_add_flags(CMAKE_ASM_YASM_FLAGS --prefix=_)
 endif()
 
+## Utilities/co_add_asm_dependencies
+# ```
+# co_add_asm_dependencies(file file...)
+# ```
+#
+# Scan input ASM files for dependencies and set the
+# [OBJECT_DEPENDS](http://www.cmake.org/cmake/help/v3.3/prop_sf/OBJECT_DEPENDS.html)
+# property to ensure rebuilds are triggered as necessary.
+#
+# Due to limitations of CMake, Consort will not scan for new dependencies when
+# files change - so it may be necessary to re-run cmake occasionally to trigger
+# proper rebuilds.
 function(co_add_asm_dependencies)
 	get_directory_property(_defs_list COMPILE_DEFINITIONS)
 	set(_defs "")
@@ -501,6 +671,25 @@ function(co_add_asm_dependencies)
 	endforeach()
 endfunction()
 # Configure warning flags
+
+## Warnings/CONSORT_SOFT_C_WARNING_FLAGS
+# List of flags Consort will add when soft warnings are enabled for C source files.
+
+## Warnings/CONSORT_SOFT_CXX_WARNING_FLAGS
+# List of flags Consort will add when soft warnings are enabled for C++# source files.
+
+## Warnings/CONSORT_SOFT_WARNING_FLAGS
+# List of flags Consort will add when soft warnings are enabled.
+
+## Warnings/CONSORT_STRICT_WARNING_FLAGS
+# List of flags Consort will add when strict warnings are enabled.
+
+## Warnings/CONSORT_SUPPRESS_WARNING_FLAGS
+# List of flags Consort will add when warnings are suppressed.
+
+## Warnings/CONSORT_WARNINGS_ARE_ERRORS
+# Flags Consort will add when [co_warnings_are_errors](#/co_warnings_are_errors)
+# is set to ON.
 
 if( CONSORT_GCC OR CONSORT_CLANG )
 	set(CONSORT_SOFT_C_WARNING_FLAGS
@@ -627,9 +816,24 @@ elseif( CONSORT_MSVC )
 	set( CONSORT_STRICT_WARNING_FLAGS /W3 )
 endif()
 
+## Warnings/co_suppress_warnings
+# ```
 # co_suppress_warnings()
+# ```
 #
-# Suppress all warnings
+# Suppress all warnings from targets in the current directory and below.
+#
+# Consort provides three levels of warning, with appropriate flags set for each
+# supported compiler. [co_suppress_warnings](#/co_suppress_warnings) is the
+# softest level, it only reports warnings that are almost certainly errors - and
+# even then only a handful. `co_suppress_warnings` is only recommended for
+# external code where warnings cannot be fixed.
+# [co_soft_warnings](#/co_soft_warnings) generates warnings that can often lead
+# to bugs (although will likely yield a number of false positives).
+# [co_strict_warnings](#/co_strict_warnings) generates warnings for any code that
+# could lead to a bug, and where the code can be re-written to suppress the
+# warning if it is a false positive. Consort uses strict warnings, and treats
+# warnings as errors by default.
 function( co_suppress_warnings )
 	set(CONSORT_WARNING_FLAGS "${CONSORT_SUPPRESS_WARNING_FLAGS}" PARENT_SCOPE)
 
@@ -644,9 +848,24 @@ function( co_suppress_warnings )
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" PARENT_SCOPE)
 endfunction()
 
+## Warnings/co_soft_warnings
+# ```
 # co_soft_warnings()
+# ```
 #
 # Apply soft warning flags to this directory and below.
+#
+# Consort provides three levels of warning, with appropriate flags set for each
+# supported compiler. [co_suppress_warnings](#/co_suppress_warnings) is the
+# softest level, it only reports warnings that are almost certainly errors - and
+# even then only a handful. `co_suppress_warnings` is only recommended for
+# external code where warnings cannot be fixed.
+# [co_soft_warnings](#/co_soft_warnings) generates warnings that can often lead
+# to bugs (although will likely yield a number of false positives).
+# [co_strict_warnings](#/co_strict_warnings) generates warnings for any code that
+# could lead to a bug, and where the code can be re-written to suppress the
+# warning if it is a false positive. Consort uses strict warnings, and treats
+# warnings as errors by default.
 function( co_soft_warnings )
 	set(CONSORT_WARNING_FLAGS "${CONSORT_SOFT_WARNING_FLAGS}" PARENT_SCOPE)
 
@@ -661,9 +880,24 @@ function( co_soft_warnings )
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" PARENT_SCOPE)
 endfunction()
 
+## Warnings/co_strict_warnings
+# ```
 # co_strict_warnings()
+# ```
 #
 # Apply strict warning flags to this directory and below.
+#
+# Consort provides three levels of warning, with appropriate flags set for each
+# supported compiler. [co_suppress_warnings](#/co_suppress_warnings) is the
+# softest level, it only reports warnings that are almost certainly errors - and
+# even then only a handful. `co_suppress_warnings` is only recommended for
+# external code where warnings cannot be fixed.
+# [co_soft_warnings](#/co_soft_warnings) generates warnings that can often lead
+# to bugs (although will likely yield a number of false positives).
+# [co_strict_warnings](#/co_strict_warnings) generates warnings for any code that
+# could lead to a bug, and where the code can be re-written to suppress the
+# warning if it is a false positive. Consort uses strict warnings, and treats
+# warnings as errors by default.
 function( co_strict_warnings )
 	set(CONSORT_WARNING_FLAGS "${CONSORT_STRICT_WARNING_FLAGS}" PARENT_SCOPE)
 
@@ -678,7 +912,10 @@ function( co_strict_warnings )
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" PARENT_SCOPE)
 endfunction()
 
+## Warnings/co_warnings_are_errors
+# ```
 # co_warnings_are_errors(ON|OFF)
+# ```
 #
 # Set whether or not warnings are errors
 function( co_warnings_are_errors flag )
@@ -771,7 +1008,116 @@ if(CONSORT_MSVC)
 	list(APPEND CONSORT_COMPILE_FLAGS "/bigobj" "/Zm1000")
 endif()
 
-
+## Build Targets/CONSORT_COMMON_GROUPS
+#
+# Groups common to all target types ([co_exe](#/co_exe), [co_lib](#/co_lib) and
+# [co_dll](#/co_dll)).
+#
+# Groups define a set of information related to a target, groups are found in
+# the list of arguments to a target by looking for the group name followed by a
+# colon. For example:
+#
+#     co_exe(hello sources: *.cpp)
+#
+# the target above uses the "sources:" group to define the source files for the
+# target. Every argument that is not a [flag](CONSORT_COMMON_FLAGS) until the
+# next group name is considered part of the group.
+#
+# sources
+# : Source files for the target. May include globbing expressions. Every source
+#   file or glob must match at least one file that already exists, otherwise
+#   Consort will generate an error. The CMake documentation recommends against
+#   using globbing expressions, however, Consort believes that its easier to
+#   use a globbing expression and re-run cmake as necessary, rather than having
+#   to edit the build configuration every time you add a source file.
+#
+# generated-sources
+# : Source files that are conditional or generated in some way by the build
+#   system or other targets. May include generator expressions but not globbing
+#   expressions.
+#
+# asm-sources
+# : Assembler sources for use with yasm. These files will not be built if ASM
+#   support is disabled or yasm was not found on the build system. May include
+#   globbing expressions. Every source file or glob must match at least one file
+#   that already exists, otherwise Consort will generate an error.
+#
+# generic-sources
+# : Source files to use when ASM support is disabled or yasm was not found. If
+#   ASM support is enabled and yasm was found these files will not be built. May
+#   include globbing expressions. Every source file or glob must match at least
+#   one file that already exists, otherwise Consort will generate an error.
+#
+# libraries
+# : Libraries to link into the target. May include the names of other targets,
+#   generator expressions, or variable expansions that define the location of a
+#   library (e.g. `${Boost_SYSTEM_LIBRARY}`). Results in a call to
+#   [target_link_libraries](http://www.cmake.org/cmake/help/v3.3/command/target_link_libraries.html).
+#
+# qt-modules
+# : Qt modules to link into the target. [co_enable_qt](#/co_enable_qt) should be
+#   called before attempting to use Qt support. The module names should be
+#   capitalised and omit the Qt prefix. For example, use `qt-modules: Core Gui`
+#   to link to QtCore and QtGui. Results in a call to
+#   [target_link_libraries](http://www.cmake.org/cmake/help/v3.3/command/target_link_libraries.html).
+#
+# compile-flags
+# : Add compile flags for the target. May include generator expressions. Note:
+#   the compile flags will apply to all source files (except asm-sources) for
+#   the target, so take care to specify options that your compiler will accept
+#   for all types of source file the target uses. Results in a call to
+#   [target_compile_options](http://www.cmake.org/cmake/help/v3.3/command/target_compile_options.html)
+#
+# link-flags
+# : Add link flags for the target. May include generator expressions. Sets the
+#   [LINK_FLAGS](http://www.cmake.org/cmake/help/v3.3/prop_tgt/LINK_FLAGS.html)
+#   property on the target.
+#
+# depends
+# : Explicitly declare that the target depends on other CMake targets. Results
+#   in a call to [add_dependencies](http://www.cmake.org/cmake/help/v3.3/command/add_dependencies.html).
+#
+# output-name
+# : By default, CMake will use the target name as the name of the output file,
+#   `output-name` can be used to change the output file name. Sets the
+#   [OUTPUT_NAME](http://www.cmake.org/cmake/help/v3.3/prop_tgt/OUTPUT_NAME.html)
+#   property on the target.
+#
+# resources
+# : Explicitly list Qt resource files that should be compiled into the target.
+#   It is also acceptable to include Qt resource files in the sources: group, as
+#   Consort enables the [AUTORCC](http://www.cmake.org/cmake/help/v3.3/variable/CMAKE_AUTORCC.html)
+#   functionality of cmake.
+#
+# ui-sources
+# : List Qt UI files that could be compiled into the target. The files will be
+#   generated in the current build directory, and can be included with
+#   `#include "ui_{filename}.h"`.
+#
+# moc-sources
+# : List source files that should be run through Qt's MOC. The generated files
+#   will automatically be compiled into the target. Note, that the preferred
+#   method for triggering MOC runs is to set the [automoc](#/CONSORT_COMMON_FLAGS)
+#   flag on the target.
+#
+# translations
+# : List Qt ts files that should generated for the target, and compiled into it.
+#   Consort will run Qt's linguist tools to generate translatable strings for
+#   the target and put the results in the specified .ts files. The translated
+#   strings will then be compiled into the target as resources, available under
+#   the `:/translations` prefix.
+#
+# tr-sources
+# : List Qt ts files that should be compiled into the target. The translated
+#   strings will then be compiled into the target as resources, available under
+#   the `:/translations` prefix. Unlike the `translations` group, the files in
+#   the `tr-sources` group are not automatically generated from the source files
+#   for thr target.
+#
+# qm-sources
+# : List Qt qm files that should be compiled into the target. The qm files will
+#   be made available as resources, available under the `:/translations` prefix.
+#
 set(CONSORT_COMMON_GROUPS
 	sources
 	generated-sources
@@ -810,6 +1156,24 @@ set(CONSORT_COMMON_GROUPS
 	#cotire_exclude
 )
 
+## Build Targets/CONSORT_COMMON_FLAGS
+#
+# Flags common to all target types ([co_exe](#/co_exe), [co_lib](#/co_lib) and
+# [co_dll](#/co_dll)). Flags are keywords that can be added to the definition of
+# a target to enable some additional functionality or properties, e.g.
+#
+#     co_exe(hello sources: *.cpp automoc)
+#
+# the `automoc` keyword in the above example is a flag, and causes Consort to
+# set the AUTOMOC property on the target. Flags may appear anywhere in the
+# argument list.
+#
+# automoc
+# : Enable automoc for the target (see the [AUTOMOC CMake documentation](http://www.cmake.org/cmake/help/v3.3/prop_tgt/AUTOMOC.html))
+#
+# autouic
+# : Enable autouic for the target (see the [AUTOUIC CMake documentation](http://www.cmake.org/cmake/help/v3.3/prop_tgt/AUTOUIC.html))
+#
 set( CONSORT_COMMON_FLAGS
 	automoc
 	autouic
@@ -819,7 +1183,29 @@ set( CONSORT_COMMON_FLAGS
 	#no_version_symlink
 )
 
-
+## Utilities/co_process_common_args
+#
+# ```
+# co_process_common_args(target)
+# ```
+#
+# This function is used to process groups and flags common to all target types.
+# It is used internally by Consort to set the properties according to arguments
+# passed to the target generation functions ([co_exe](#/co_exe),
+# [co_lib](#/co_lib) and [co_dll](#/co_dll)).
+#
+# If necessary, you can use it in your own custom routines to add support for
+# Consort's common flags:
+#
+#     function(my_target name)
+#         co_parse_args(THIS "${CONSORT_COMMON_GROUPS}" "${CONSORT_COMMON_FLAGS}" ${ARGN})
+#
+#         co_safe_glob(THIS_SOURCES ${THIS_SOURCES})
+#         add_executable(${name} ${THIS_SOURCES} ${THIS_GENERATED_SOURCES})
+#
+#         co_process_common_args(${name})
+#     endfunction()
+#
 function( co_process_common_args target )
 	if( THIS_AUTOMOC )
 		set_target_properties( "${target}" PROPERTIES AUTOMOC TRUE )
@@ -909,6 +1295,35 @@ function( co_process_common_args target )
 		target_include_directories("${target}" PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
 	endif()
 endfunction()
+## Build Targets/co_exe
+#
+# ```
+# co_exe(name groups... flags...)
+# ```
+#
+# Declare an executable (EXE) target. The properties of the target are
+# specified in a declarative fashion as [groups](#/CONSORT_COMMON_GROUPS) and
+# [flags](#/CONSORT_COMMON_FLAGS). The most common groups you will need with
+# the `co_dll` function are the `sources:` group, for specifying source files,
+# and the `libraries:` group, for specifying libraries to link against.
+#
+# `co_exe` supports all the common groups and flags, consult the documentation
+# for [CONSORT_COMMON_GROUPS](#/CONSORT_COMMON_GROUPS) and
+# [CONSORT_COMMON_FLAGS](#/CONSORT_COMMON_FLAGS) for more information on the
+# available options.
+#
+# `co_exe` also supports the following flag:
+#
+# gui
+# : Declare the target to be a GUI program, on Windows this causes the
+#   [WIN32_EXECUTABLE](http://www.cmake.org/cmake/help/v3.3/prop_tgt/WIN32_EXECUTABLE.html)
+#   property to be set on the target and will enable auto-linking to QtMain.
+#   The flag currently has no effect on Linux or OS X.
+#
+# Example:
+#
+#    co_exe( my_program sources: my_program.cpp libraries: my_library)
+#
 function(co_exe name)
 	co_parse_args( THIS "${CONSORT_COMMON_GROUPS}" "${CONSORT_COMMON_FLAGS};gui" ${ARGN} )
 	set(THIS_NAME "${name}")
@@ -930,6 +1345,31 @@ function(co_exe name)
 	co_process_common_args( ${THIS_NAME} )
 
 endfunction()
+## Build Targets/co_lib
+#
+# ```
+# co_lib(name groups... flags...)
+# ```
+#
+# Declare a static library (archive) target. The properties of the target are
+# specified in a declarative fashion as [groups](#/CONSORT_COMMON_GROUPS) and
+# [flags](#/CONSORT_COMMON_FLAGS). The most common groups you will need with
+# the `co_lib` function are the `sources:` group, for specifying source files,
+# and the `libraries:` group, for specifying libraries to link against.
+#
+# `co_lib` supports all the common groups and flags, consult the documentation
+# for [CONSORT_COMMON_GROUPS](#/CONSORT_COMMON_GROUPS) and
+# [CONSORT_COMMON_FLAGS](#/CONSORT_COMMON_FLAGS) for more information on the
+# available options.
+#
+# If you do not specify any source files, Consort will generate a dummy source
+# file to make the target into a "real" target. This can be used to specify
+# linker dependencies or for future proofing with header only libraries.
+#
+# Example:
+#
+#    co_lib( my_library sources: my_library.cpp libraries: ${Boost_DATE_TIME_LIBRARY})
+#
 function(co_lib name)
 	co_parse_args( THIS "${CONSORT_COMMON_GROUPS}" "${CONSORT_COMMON_FLAGS}" ${ARGN} )
 	set(THIS_NAME "${name}")
@@ -956,6 +1396,31 @@ function(co_lib name)
 	co_process_common_args( ${THIS_NAME} )
 
 endfunction()
+## Build Targets/co_dll
+#
+# ```
+# co_dll(name groups... flags...)
+# ```
+#
+# Declare a shared library (DLL) target. The properties of the target are
+# specified in a declarative fashion as [groups](#/CONSORT_COMMON_GROUPS) and
+# [flags](#/CONSORT_COMMON_FLAGS). The most common groups you will need with
+# the `co_dll` function are the `sources:` group, for specifying source files,
+# and the `libraries:` group, for specifying libraries to link against.
+#
+# `co_dll` supports all the common groups and flags, consult the documentation
+# for [CONSORT_COMMON_GROUPS](#/CONSORT_COMMON_GROUPS) and
+# [CONSORT_COMMON_FLAGS](#/CONSORT_COMMON_FLAGS) for more information on the
+# available options.
+#
+# If you do not specify any source files, Consort will generate a dummy source
+# file to make the target into a "real" target. This can be used to specify
+# linker dependencies or for future proofing with header only libraries.
+#
+# Example:
+#
+#    co_dll( my_library sources: my_library.cpp libraries: ${Boost_DATE_TIME_LIBRARY})
+#
 function(co_dll name)
 	co_parse_args( THIS "${CONSORT_COMMON_GROUPS}" "${CONSORT_COMMON_FLAGS}" ${ARGN} )
 	set(THIS_NAME "${name}")
@@ -982,12 +1447,39 @@ function(co_dll name)
 	co_process_common_args( ${THIS_NAME} )
 
 endfunction()
+## Module Functions/co_find_modules
+# ```
 # co_find_modules( path )
+# ```
 #
 # Find consort modules located in the specified directory (relative to
 # CMAKE_CURRENT_SOURCE_DIR). A consort module is a subdirectory of path that
 # contains a module.cmake file. The module.cmake file will be included.
-
+#
+# To create a module, create a subdirectory of the search path (for example,
+# if you call `co_find_modules(modules)` create your module in the
+# `modules/my_module` directory), then create a `CMakeLists.txt` and a
+# `module.cmake` file in that directory. In the `CMakeLists.txt` declare your
+# targets as normal. In the `module.cmake` file call [co_module](#/co_module)
+# to declare your module.
+#
+# You should call this after including consort.cmake and pass in directories
+# you would like Consort to search for modules.
+#
+# Consort will automatically enable modules that are linked to by targets
+# included in the build. You can explicitly request Consort include a module
+# using [co_require_module](#/co_require_module). At the end of your root
+# CMakeLists.txt you should call [co_include_modules](#/co_include_modules) to
+# include all activated modules.
+#
+# Example:
+#
+#     co_find_modules(modules)
+#
+#     # Explicitly enable my_module
+#     co_require_module(my_module)
+#
+#     co_include_modules()
 function(co_find_modules path)
 	if(CONSORT_DEBUG GREATER 0)
 		message("Consort searching for modules under ${path}")
@@ -1002,14 +1494,32 @@ function(co_find_modules path)
 	set(CONSORT_MODULES ${CONSORT_MODULES} PARENT_SCOPE)
 endfunction()
 
-# co_module( name
-#     [directory: (relative path to module directory)]
-#     [aliases: alias alias ...]
-# )
+## Module Functions/co_module
 #
-# Declare a Consort module
+#     co_module( name
+#         [directory: (relative path to module directory)]
+#         [aliases: alias alias ...]
+#     )
 #
-
+# Declare a Consort module. A consort module is a directory containing a
+# CMakeLists.txt and a module.cmake file. The CMakeLists.txt file defines how
+# to build the module. The module.cmake file registers the module with Consort.
+# Calls to the `co_module` function should be placed in the module.cmake file.
+# Consort will then fulfil requests to activate the module by calling
+# [add_subdirectory](http://www.cmake.org/cmake/help/v3.3/command/add_subdirectory.html)
+# on the directory associated with the module. See [co_find_modules](#/co_find_modules)
+# for more information.
+#
+# The `name` of the module is the name used to activate it, this should normally
+# be the name of the library target the module exports, as this will allow
+# Consort to automatically activate the module when a target links to it.
+#
+# The `directory:` is the directory to pass to `add_subdirectory`. By default
+# this will be the location of the module.cmake file. Otherwise, it is specified
+# relative to the path to the module.cmake file.
+#
+# The `aliases:` group allows additional names to be associated with the module,
+# if, for example, the module contains multiple library targets.
 function(co_module name)
 	co_parse_args(MODULE "directory;aliases" "" ${ARGN})
 	if(NOT MODULE_DIRECTORY)
@@ -1038,10 +1548,14 @@ endfunction()
 
 
 
-
+## Module Functions/co_require_module
+# ```
 # co_require_module( name )
+# ```
 #
-# Add the specified module to the list of modules Consort will enable
+# Add the specified module to the list of modules Consort will enable.
+#
+# See [co_find_modules](#/co_find_modules) and [co_module](#/co_module).
 #
 set( CONSORT_ACTIVE_MODULES "" CACHE INTERNAL "enabled modules" )
 function(co_require_module name)
@@ -1060,10 +1574,27 @@ function(co_require_module name)
 	endif()
 endfunction()
 
+## Module Functions/co_include_modules
+# ```
 # co_include_modules()
+# ```
 #
-# call add_subdirectory for every active module, if any modules are added to the
-# active list, add_subdirectory will also be called for those modules.
+# Call [add_subdirectory](http://www.cmake.org/cmake/help/v3.3/command/add_subdirectory.html)
+# for every active module that has not already been
+# included, if any modules are added to the active list,
+# [add_subdirectory](http://www.cmake.org/cmake/help/v3.3/command/add_subdirectory.html)
+# will also be called for those modules.
+#
+# See [co_find_modules](#/co_find_modules) and [co_module](#/co_module).
+#
+# Example:
+#
+#     co_find_modules(modules)
+#
+#     # Explicitly enable my_module
+#     co_require_module(my_module)
+#
+#     co_include_modules()
 set( CONSORT_ACTIVATED_MODULES "" CACHE INTERNAL "activated modules" )
 function(co_include_modules)
 
@@ -1102,7 +1633,10 @@ function(co_include_modules)
 		message("-- Consort activated ${_activated_count} modules")
 	endif()
 endfunction()
+## Utilities/co_link
+# ```
 # co_link(target link)
+# ```
 #
 # Create a symbolic link (or junction on Windows) at "link" that points to
 # "target".
@@ -1139,9 +1673,15 @@ function(co_link target link)
 		endif()
 	endif()
 endfunction()
+## Utilities/co_runtime_dll
+# ```
 # co_runtime_dll(file file...)
+# ```
 #
-# Copy DLLs required at runtime to the bin folder.
+# Copy DLLs required at runtime to the bin folder. On Windows in particular,
+# it may be necessary to have DLLs in the same folder as the compiled binaries
+# in order for the loader to find them. This routine automatically copies the
+# files passed as arguments to all of the runtime output directories.
 function(co_runtime_dll)
 	if( CO_MULTICONFIG_BUILD )
 		set( _dirs
@@ -1165,11 +1705,18 @@ function(co_runtime_dll)
 	endif()
 endfunction()
 
+## Utilities/co_runtime_link
+# ```
 # co_runtime_link(target linkname)
+# ```
 #
 # Link the "target" file or directory as "linkname" in each of the runtime
-# output locations. Unlike co_link, this will create multiple links for CMake
-# generators that support multiple build configurations.
+# output locations. Unlike [co_link](#/co_link), this will create multiple links
+# for CMake generators that support multiple build configurations.
+#
+# This is useful for linking resources such as data files or plugins into the
+# build directory so the build directory can emulate an installed version of the
+# software.
 function(co_runtime_link target linkname)
 	if( CO_MULTICONFIG_BUILD )
 		set( _dirs
@@ -1190,13 +1737,22 @@ function(co_runtime_link target linkname)
 		endforeach()
 	endif()
 endfunction()
+## Externals/co_prefer_static
+# ```
 # co_prefer_static()
+# ```
 #
 # Prefer finding static libraries (.a files) to shared libraries (.so) files
 # when using find_package or find_libraries. Not supported on Windows as static
 # and shared libraries both use the .lib extension.
 #
 # Call this as needed to change the behaviour for subsequent external libraries.
+#
+# Example:
+#
+#     co_prefer_static()
+#     find_package(PNG) # find static libpng if possible (otherwise fall back to shared)
+#
 macro( co_prefer_static )
 	if( NOT CONSORT_WINDOWS )
 		list( REMOVE_ITEM CMAKE_FIND_LIBRARY_SUFFIXES   ".a" )
@@ -1204,13 +1760,22 @@ macro( co_prefer_static )
 	endif()
 endmacro()
 
+## Externals/co_prefer_shared
+# ```
 # co_prefer_shared()
+# ```
 #
 # Prefer finding shared libraries (.so files) to static libraries (.a) files
 # when using find_package or find_libraries. Not supported on Windows as static
 # and shared libraries both use the .lib extension.
 #
 # Call this as needed to change the behaviour for subsequent external libraries.
+#
+# Example:
+#
+#     co_prefer_shared()
+#     find_package(PNG) # find shared libpng if possible (otherwise fall back to static)
+#
 macro( co_prefer_shared )
 	if( NOT CONSORT_WINDOWS )
 		list( REMOVE_ITEM CMAKE_FIND_LIBRARY_SUFFIXES ".a" )
@@ -1225,26 +1790,29 @@ if(CONSORT_VALGRIND_TESTS)
 	endif()
 endif()
 
-# co_test(
-#    target-name arg arg...
-#    command: ...
-#    working-directory: ...
-#    configurations: ...
-#    suppressions: ...
-#    no-valgrind
-# )
+## Build Targets/co_test
 #
-# Mark target-name as a test suite for ctest to run. The configurations option
+#     co_test(
+#        target-name arg arg...
+#        command: ...
+#        working-directory: ...
+#        configurations: ...
+#        suppressions: ...
+#        no-valgrind
+#     )
+#
+# Mark target-name as a test suite for ctest to run. The `configurations` group
 # can be used to indicate the test should only be run for particular build
-# configurations. The suppressions option can be used to add suppression files
-# when the test is run under valgrind and the no-valgrind option can be used
+# configurations. The `suppressions` group can be used to add suppression files
+# when the test is run under valgrind and the `no-valgrind` flag can be used
 # to indicate the test should not be run under valgrind.
 #
-# The command option can be used to run the test within a specific environment,
+# The `command` group can be used to run the test within a specific environment,
 # e.g. under xvfb for test suites that require an X frame buffer but need to be
-# able to run headless.
+# able to run headless. The `command` group is prefixed to the command used to
+# run the test.
 #
-# The working-directory option can be used to specify a working directory for
+# The `working-directory` option can be used to specify a working directory for
 # the test.
 function( co_test name )
 	co_parse_args( THIS "configurations;suppressions;command;working-directory" "no-valgrind" ${ARGN} )
@@ -1319,8 +1887,43 @@ function( co_test name )
 	endif()
 endfunction()
 
+## Externals/CONSORT_BOOST_LOCATIONS
+#
 # Define a list of directories to search for boost, Consort will automatically
-# add these directories to locations to search for Boost.
+# add these directories to locations to search for Boost. You can modify this
+# list before calling [co_enable_boost](#/co_enable_boost) to adjust the
+# locations Consort will search.
+#
+# By default, [co_enable_boost](#/co_enable_boost) searches the following locations:
+#
+### Windows
+# * c:/opt/boost/cxx${CMAKE_CXX_STANDARD}/${CONSORT_PLATFORM_NAME}/${CONSORT_COMPILER_NAME}
+# * c:/boost/cxx${CMAKE_CXX_STANDARD}/${CONSORT_PLATFORM_NAME}/${CONSORT_COMPILER_NAME}
+# * c:/opt/boost/cxx${CMAKE_CXX_STANDARD}/${CONSORT_PLATFORM_NAME}
+# * c:/boost/cxx${CMAKE_CXX_STANDARD}/${CONSORT_PLATFORM_NAME}
+# * c:/opt/boost/cxx${CMAKE_CXX_STANDARD}/${CONSORT_COMPILER_NAME}
+# * c:/boost/cxx${CMAKE_CXX_STANDARD}/${CONSORT_COMPILER_NAME}
+# * c:/opt/boost/cxx${CMAKE_CXX_STANDARD}
+# * c:/boost/cxx${CMAKE_CXX_STANDARD}
+# * c:/opt/boost/${CONSORT_PLATFORM_NAME}/${CONSORT_COMPILER_NAME}
+# * c:/boost/${CONSORT_PLATFORM_NAME}/${CONSORT_COMPILER_NAME}
+# * c:/opt/boost/${CONSORT_PLATFORM_NAME}
+# * c:/boost/${CONSORT_PLATFORM_NAME}
+# * c:/opt/boost/${CONSORT_COMPILER_NAME}
+# * c:/boost/${CONSORT_COMPILER_NAME}
+# * c:/opt/boost
+# * c:/boost
+#
+### Linux and OS X
+# * /opt/boost/${CONSORT_PLATFORM_NAME}/${CONSORT_COMPILER_NAME}/cxx${CMAKE_CXX_STANDARD}
+# * /opt/boost/${CONSORT_PLATFORM_NAME}/cxx${CMAKE_CXX_STANDARD}
+# * /opt/boost/${CONSORT_COMPILER_NAME}/cxx${CMAKE_CXX_STANDARD}
+# * /opt/boost/cxx${CMAKE_CXX_STANDARD}
+# * /opt/boost/${CONSORT_PLATFORM_NAME}/${CONSORT_COMPILER_NAME}
+# * /opt/boost/${CONSORT_PLATFORM_NAME}
+# * /opt/boost/${CONSORT_COMPILER_NAME}
+# * /opt/boost
+#
 set(CONSORT_BOOST_LOCATIONS "")
 if(CONSORT_WINDOWS)
 	if(CMAKE_CXX_STANDARD)
@@ -1363,10 +1966,26 @@ if(CONSORT_LINUX OR CONSORT_MACOSX)
 	)
 endif()
 
+## Externals/co_enable_boost
+#
+# ```
 # co_enable_boost(version component component...)
+# ```
 #
 # Enable support for Boost, you should specify the version of boost you are
 # developing against and a list of boost libraries to find.
+#
+# Consort searches the paths in [CONSORT_BOOST_LOCATIONS](#/CONSORT_BOOST_LOCATIONS)
+# for the specified boost version and libraries. Consort will not search system
+# paths and will look for static libraries. Consort:
+#
+# * Adds the boost include directory to the list of global include directories.
+# * Enables boost filesystem V3 (`-DBOOST_FILESYSTEM_VERSION=3`).
+# * Disables autolinking on windows (`-DBOOST_ALL_NO_LIB`).
+#
+# Where necessary Consort will sanitise boost library names to make linking to
+# boost as painless as possible.
+#
 macro(co_enable_boost version)
 	foreach(_dir ${CONSORT_BOOST_LOCATIONS})
 		if(EXISTS "${_dir}")
@@ -1414,7 +2033,11 @@ macro(co_enable_boost version)
 	endif()
 endmacro()
 
+## Externals/co_enable_default_boost
+#
+# ```
 # co_enable_default_boost(component component...)
+# ```
 #
 # Enable the boost version and libraries that Consort uses by default.
 # By default Consort requests boost 1.58 (the most recent at time of writing)
@@ -1422,6 +2045,21 @@ endmacro()
 #
 # You may specify additional components to load as arguments to this function.
 #
+# By default Consort finds the following boost libraries:
+#
+# * date_time
+# * chrono
+# * context
+# * coroutine
+# * filesystem
+# * system
+# * thread
+# * random
+# * regex
+# * atomic
+# * graph
+#
+# It is not necessary to specify header only libraries in the component list.
 macro(co_enable_default_boost)
 	co_enable_boost(
 		1.58
@@ -1439,8 +2077,25 @@ macro(co_enable_default_boost)
 		${ARGN}
 	)
 endmacro()
+## Externals/CONSORT_QT5_LOCATIONS
 # Define a list of directories to search for boost, Consort will automatically
 # add these directories to locations to search for Boost.
+#
+# By default, [co_enable_boost](#/co_enable_boost) searches the following locations:
+#
+### Windows
+# * c:/opt/qt5/${CONSORT_PLATFORM_NAME}
+# * c:/qt5/${CONSORT_PLATFORM_NAME}
+# * c:/opt/qt/${CONSORT_PLATFORM_NAME}
+# * c:/qt/${CONSORT_PLATFORM_NAME}
+# * c:/opt/qt
+# * c:/qt
+#
+### Linux and Mac OS X
+# * /opt/qt5/${CONSORT_PLATFORM_NAME}
+# * /opt/qt5
+# * /opt/qt/${CONSORT_PLATFORM_NAME}
+# * /opt/qt
 set(CONSORT_QT5_LOCATIONS "")
 if(CONSORT_WINDOWS)
 	list(APPEND CONSORT_QT5_LOCATIONS
@@ -1461,10 +2116,27 @@ if(CONSORT_LINUX OR CONSORT_MACOSX)
 	)
 endif()
 
-
+## Externals/co_enable_qt
+# ```
 # co_enable_qt(module module...)
+# ```
 #
-# Find and enable support for Qt5
+# Find and enable support for Qt5. You should specify the Qt modules you
+# want (in addition to Core). For example
+#
+# ```
+# co_enable_qt(Gui Widgets)
+# ```
+#
+# will find QtCore, QtGui and QtWidgets. Libraries can then be linked to targets
+# through the use of the [qt-modules](CONSORT_COMMON_GROUPS) group.
+#
+# Consort will automatically copy or symlink Qt binaries into the build (bin)
+# directory to ensure that Qt programs can be launched directly from the build
+# output. Consort also sets [CMAKE_AUTORCC](http://www.cmake.org/cmake/help/v3.3/variable/CMAKE_AUTORCC.html)
+# to enable automatic compilation of resources.
+#
+# If Qt is found, the `QT_FOUND` and `QT5_FOUND` flags will be set to 1.
 macro(co_enable_qt5)
 	if(NOT QT_ROOT)
 		if(CONSORT_GCC AND CONSORT_64BIT)
@@ -1623,11 +2295,33 @@ macro(co_enable_qt5)
 	endif()
 endmacro()
 
+## Externals/co_enable_default_qt5
+# ```
 # co_enable_default_qt5(module module...)
+# ```
 #
 # Find and enable support for Qt5. This macro will use the default list of
 # modules provided by Consort, you can add additional modules if necessary.
 #
+# The default modules are:
+#
+# * Gui
+# * Widgets
+# * Network
+# * WebKit
+# * WebKitWidgets
+# * WebChannel
+# * Sql
+# * Svg
+# * OpenGL
+# * Concurrent
+# * Multimedia
+# * PrintSupport
+# * MultimediaWidgets
+# * Positioning
+# * Qml
+# * Quick
+# * Sensors
 macro(co_enable_default_qt5)
 	co_enable_qt5(
 		Gui
@@ -1651,11 +2345,14 @@ macro(co_enable_default_qt5)
 	)
 endmacro()
 
+## Utilities/co_write_file_if_changed
+# ```
 # co_write_file_if_changed( filename content )
+# ```
 #
 # Ensure "filename" contains "content", but do not touch the file if it is not
 # necessary. Useful for generating output files, without triggering rebuilds
-# when cmake is run.
+# when cmake is run. Equivalent to `file(WRITE "${filename}" "${content}")`.
 #
 function( co_write_file_if_changed filename content )
 	if( EXISTS "${filename}" )
@@ -1870,10 +2567,26 @@ macro( QT_USE_MODULES )
 	endforeach()
 endmacro()
 
+## Externals/co_process_qt_args
+# ```
 # co_process_qt_args(target)
+# ```
 #
 # Adjust properties of target as necessary to add Qt support. Note that this
-# macro needs to be called before target is declared.
+# macro needs to be called before target is declared. This macro is analogous
+# to [co_process_common_args](#/co_process_common_args), but for Qt specific
+# functionality. This is normally called for you by Consort, however, you
+# can use it to process the common Qt arguments for your targets if necessary.
+#
+#     function(my_target name)
+#         co_parse_args(THIS "${CONSORT_COMMON_GROUPS}" "${CONSORT_COMMON_FLAGS}" ${ARGN})
+#
+#         co_safe_glob(THIS_SOURCES ${THIS_SOURCES})
+#         co_process_qt_args(${name})
+#         add_executable(${name} ${THIS_SOURCES} ${THIS_GENERATED_SOURCES})
+#
+#         co_process_common_args(${name})
+#     endfunction()
 #
 macro(co_process_qt_args target)
 	set(THIS_TRANSLATION_SOURCES

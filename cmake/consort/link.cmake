@@ -1,4 +1,7 @@
+## Utilities/co_link
+# ```
 # co_link(target link)
+# ```
 #
 # Create a symbolic link (or junction on Windows) at "link" that points to
 # "target".
