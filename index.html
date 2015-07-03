@@ -99,7 +99,7 @@
 			$scope.q = $location.search().q;
 			$scope.docs = [];
 			$scope.state = {current:null};
-			$http.get('consort.json').then(function(data) {
+			$http.get('https://raw.githubusercontent.com/consort-cmake/consort-cmake/master/dist/docs/consort.json').then(function(data) {
 				$scope.docs = $filter('orderBy')(data.data,'title');
 
 				var headingMap = {};
@@ -119,16 +119,18 @@
 				$scope.headings = $filter('orderBy')($scope.headings,'heading');
 
 				$scope.docs.unshift({
-					title:'Tutorial',
-					path:['Tutorial'],
-					templateUrl:'tutorial.html'
-				},{
 					title:'Introduction',
 					path:['Introduction'],
 					templateUrl:'introduction.html'
+				},{
+					title:'Tutorial',
+					path:['Tutorial'],
+					templateUrl:'tutorial.html'
 				});
-				$scope.headings.unshift({heading:$scope.docs[0].title,items:[$scope.docs[0]]});
-				$scope.headings.unshift({heading:$scope.docs[1].title,items:[$scope.docs[1]]});
+				$scope.headings.unshift(
+					{heading:$scope.docs[0].title,items:[$scope.docs[0]]},
+					{heading:$scope.docs[1].title,items:[$scope.docs[1]]}
+				);
 
 				$scope.state.current = $scope.docs[0];
 
