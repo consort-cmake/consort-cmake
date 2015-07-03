@@ -64,30 +64,26 @@ if( CMAKE_HOST_UNIX )
 	if( APPLE )
 		execute_process(
 			COMMAND df -T nfs "${CMAKE_BINARY_DIR}"
-			RESULT_VARIABLE BINARY_DIR_IS_NFS_STATUS
-			OUTPUT_VARIABLE DF_SENT_TO_NULL
+			RESULT_VARIABLE _result
+			OUTPUT_QUIET
 		)
 
-		if("${BINARY_DIR_IS_NFS_STATUS}" STREQUAL "0")
-			set(BINARY_DIR_IS_NFS ON)
-		else()
-			set(BINARY_DIR_IS_NFS OFF)
+		if("${_result}" STREQUAL "0")
+			set(_nfs_build 1)
 		endif()
 	else()
 		execute_process(
 			COMMAND stat -f -c %T "${CMAKE_BINARY_DIR}"
-			OUTPUT_VARIABLE BINARY_DIR_FS
+			OUTPUT_VARIABLE _result
 			OUTPUT_STRIP_TRAILING_WHITESPACE
 		)
 
-		if(NOTBINARY_DIR_FS STREQUAL "nfs")
-			set(BINARY_DIR_IS_NFS ON)
-		else()
-			set(BINARY_DIR_IS_NFS OFF)
+		if(NOT _result STREQUAL "nfs")
+			set(_nfs_build 1)
 		endif()
 	endif()
 
-	if(BINARY_DIR_IS_NFS)
+	if(_nfs_build)
 		if(CONSORT_PERMIT_NFS_BUILDS)
 			message( WARNING "Network build directory detected, your build may be slow." )
 		else()
@@ -108,7 +104,7 @@ include_directories(${CMAKE_SOURCE_DIR})
 
 ## Variables/CONSORT_VERSION
 # Contains the current version of Consort
-set(CONSORT_VERSION 0.1.1)
+set(CONSORT_VERSION 0.1.2)
 # 32/64 bit detection
 ## Variables/CONSORT_64BIT
 # This variable is 1 if `sizeof(void*) >= 8`.
