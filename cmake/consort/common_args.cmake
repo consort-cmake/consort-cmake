@@ -46,7 +46,7 @@
 #   [target_link_libraries](http://www.cmake.org/cmake/help/v3.3/command/target_link_libraries.html).
 #
 # qt-modules
-# : Qt modules to link into the target. [co_enable_qt](#/co_enable_qt) should be
+# : Qt modules to link into the target. [co_enable_qt5](#/co_enable_qt5) should be
 #   called before attempting to use Qt support. The module names should be
 #   capitalised and omit the Qt prefix. For example, use `qt-modules: Core Gui`
 #   to link to QtCore and QtGui. Results in a call to

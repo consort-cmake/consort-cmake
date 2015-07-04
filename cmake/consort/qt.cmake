@@ -37,16 +37,16 @@ if(CONSORT_LINUX OR CONSORT_MACOSX)
 	)
 endif()
 
-## Externals/co_enable_qt
+## Externals/co_enable_qt5
 # ```
-# co_enable_qt(module module...)
+# co_enable_qt5(module module...)
 # ```
 #
 # Find and enable support for Qt5. You should specify the Qt modules you
 # want (in addition to Core). For example
 #
 # ```
-# co_enable_qt(Gui Widgets)
+# co_enable_qt5(Gui Widgets)
 # ```
 #
 # will find QtCore, QtGui and QtWidgets. Libraries can then be linked to targets
