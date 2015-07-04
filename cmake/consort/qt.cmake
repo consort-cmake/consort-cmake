@@ -50,7 +50,7 @@ endif()
 # ```
 #
 # will find QtCore, QtGui and QtWidgets. Libraries can then be linked to targets
-# through the use of the [qt-modules](CONSORT_COMMON_GROUPS) group.
+# through the use of the [qt-modules](#/CONSORT_COMMON_GROUPS) group.
 #
 # Consort will automatically copy or symlink Qt binaries into the build (bin)
 # directory to ensure that Qt programs can be launched directly from the build
