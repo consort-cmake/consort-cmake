@@ -43,14 +43,15 @@ function( co_test name )
 
 	if(THIS_WORKING_DIRECTORY)
 		set( THIS_WORKING_DIRECTORY "WORKING_DIRECTORY" ${THIS_CONFIGURATIONS} )
+	endif()
 
 	if( CONSORT_MULTICONFIG_BUILD )
 		if(NOT THIS_CONFIGURATIONS)
 			set(THIS_CONFIGURATIONS Debug Release RelWithDebInfo MinSizeRel)
 		endif()
 		foreach( config ${THIS_CONFIGURATIONS} )
-			string( TOUPPER ${config} uconfig )
-			string( TOLOWER ${config} lconfig )
+			string( TOUPPER "${config}" uconfig )
+			string( TOLOWER "${config}" lconfig )
 			if( CONSORT_VALGRIND_TESTS AND VALGRIND AND NOT THIS_NO_VALGRIND )
 				add_test(
 					NAME run-${name}-${lconfig}
@@ -77,7 +78,6 @@ function( co_test name )
 		if( THIS_CONFIGURATIONS )
 			set( THIS_CONFIGURATIONS "CONFIGURATIONS" ${THIS_CONFIGURATIONS} )
 		endif()
-		string( TOUPPER ${CMAKE_BUILD_TYPE} uconfig )
 
 		if( CONSORT_VALGRIND_TESTS AND VALGRIND AND NOT THIS_NO_VALGRIND )
 			add_test(
