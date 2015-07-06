@@ -6,3 +6,8 @@ co_exe( consort_has_asm
 	asm-sources: *.asm
 	generic-sources: *.c
 )
+
+if(CONSORT_ASM_ENABLED)
+	# if Consort reports ASM is enabled, this program should succeed
+	co_test(consort_has_asm)
+endif()

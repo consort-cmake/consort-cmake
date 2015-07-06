@@ -2,6 +2,6 @@
 
 int main()
 {
-	func();
+	module2::func();
 	return 0;
 }
