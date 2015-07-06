@@ -104,7 +104,7 @@ include_directories(${CMAKE_SOURCE_DIR})
 
 ## Variables/CONSORT_VERSION
 # Contains the current version of Consort
-set(CONSORT_VERSION 0.1.2)
+set(CONSORT_VERSION 0.1.3)
 # 32/64 bit detection
 ## Variables/CONSORT_64BIT
 # This variable is 1 if `sizeof(void*) >= 8`.
@@ -1823,14 +1823,15 @@ function( co_test name )
 
 	if(THIS_WORKING_DIRECTORY)
 		set( THIS_WORKING_DIRECTORY "WORKING_DIRECTORY" ${THIS_CONFIGURATIONS} )
+	endif()
 
 	if( CONSORT_MULTICONFIG_BUILD )
 		if(NOT THIS_CONFIGURATIONS)
 			set(THIS_CONFIGURATIONS Debug Release RelWithDebInfo MinSizeRel)
 		endif()
 		foreach( config ${THIS_CONFIGURATIONS} )
-			string( TOUPPER ${config} uconfig )
-			string( TOLOWER ${config} lconfig )
+			string( TOUPPER "${config}" uconfig )
+			string( TOLOWER "${config}" lconfig )
 			if( CONSORT_VALGRIND_TESTS AND VALGRIND AND NOT THIS_NO_VALGRIND )
 				add_test(
 					NAME run-${name}-${lconfig}
@@ -1857,7 +1858,6 @@ function( co_test name )
 		if( THIS_CONFIGURATIONS )
 			set( THIS_CONFIGURATIONS "CONFIGURATIONS" ${THIS_CONFIGURATIONS} )
 		endif()
-		string( TOUPPER ${CMAKE_BUILD_TYPE} uconfig )
 
 		if( CONSORT_VALGRIND_TESTS AND VALGRIND AND NOT THIS_NO_VALGRIND )
 			add_test(
