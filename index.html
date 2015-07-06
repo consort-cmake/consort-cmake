@@ -95,7 +95,7 @@
     <script>
     	var app = angular.module('consortDocs', ['ngMaterial','ngSanitize']);
 
-		app.controller('AppCtrl', function($scope, $http, $location, $filter, $mdSidenav){
+		app.controller('AppCtrl', function($scope, $http, $location, $filter, $mdSidenav, $sce){
 			$scope.q = $location.search().q;
 			$scope.docs = [];
 			$scope.state = {current:null};
@@ -121,11 +121,15 @@
 				$scope.docs.unshift({
 					title:'Introduction',
 					path:['Introduction'],
-					templateUrl:'introduction.html'
+					templateUrl: $sce.trustAsResourceUrl(
+						'https://raw.githubusercontent.com/consort-cmake/consort-cmake/master/dist/docs/introduction.html'
+					)
 				},{
 					title:'Tutorial',
 					path:['Tutorial'],
-					templateUrl:'tutorial.html'
+					templateUrl:  $sce.trustAsResourceUrl(
+						'https://raw.githubusercontent.com/consort-cmake/consort-cmake/master/dist/docs/tutorial.html'
+					)
 				});
 				$scope.headings.unshift(
 					{heading:$scope.docs[0].title,items:[$scope.docs[0]]},
