@@ -128,6 +128,8 @@ macro(co_enable_boost version)
 		set(Boost_USE_STATIC_LIBS   ON)
 	endif()
 
+	set(Boost_DEBUG ON)
+
 	find_package(Boost ${version} REQUIRED COMPONENTS ${ARGN})
 
 	if(NOT Boost_FOUND)

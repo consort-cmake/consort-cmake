@@ -988,14 +988,18 @@ if( CONSORT_WINDOWS_X86_64 )
 	add_definitions(-D_AMD64_)
 endif()
 
-if(CONSORT_64BIT)
-	if(CONSORT_GCC OR CONSORT_CLANG)
+
+if(CONSORT_GCC OR CONSORT_CLANG)
+	if(CONSORT_64BIT)
 		# 64 bit platforms omit frame pointers for performance reasons, but this
 		# hinders debugging and profiling. The generating expression is bordering
 		# on illegible, but it basically adds -fno-omit-frame-pointer for all
 		# configurations but Release.
 		list(APPEND CONSORT_COMPILE_FLAGS "$<$<NOT:$<CONFIG:Release>>:-fno-omit-frame-pointer>" )
 	endif()
+
+	# -fPIC is often needed, and doesn't really hurt
+	list(APPEND CONSORT_COMPILE_FLAGS -fPIC)
 endif()
 
 if(CONSORT_MSVC)
@@ -2012,6 +2016,8 @@ macro(co_enable_boost version)
 		# linking it in is the best way to avoid DLL hell and related issues.
 		set(Boost_USE_STATIC_LIBS   ON)
 	endif()
+
+	set(Boost_DEBUG ON)
 
 	find_package(Boost ${version} REQUIRED COMPONENTS ${ARGN})
 
