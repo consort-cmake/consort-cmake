@@ -163,19 +163,14 @@ macro(co_enable_qt5)
 
 			message(STATUS "Qt version: ${Qt5Core_VERSION_STRING} (${QT_ROOT})")
 
-			if( Qt5Core_VERSION_STRING VERSION_LESS "5.1" )
-				# Qt before 5.1 can generate errors
-				foreach(m ${_qt_modules})
-					co_debug(Qt5${m}_INCLUDE_DIRS)
-					foreach(d ${Qt5${m}_INCLUDE_DIRS})
-						if(NOT IS_DIRECTORY "${d}")
-							co_debug(d)
-							list(REMOVE_ITEM Qt5${m}_INCLUDE_DIRS "${d}")
-						endif()
-					endforeach()
-					co_debug(Qt5${m}_INCLUDE_DIRS)
+			# Some versions of Qt reference invalid include directories
+			foreach(m Core ${_modules})
+				foreach(d ${Qt5${m}_INCLUDE_DIRS})
+					if(NOT IS_DIRECTORY "${d}")
+						list(REMOVE_ITEM Qt5${m}_INCLUDE_DIRS "${d}")
+					endif()
 				endforeach()
-			endif()
+			endforeach()
 
 			if( NOT QT_TRANSLATIONS_DIR)
 				get_target_property(QT_QMAKE_EXECUTABLE Qt5::qmake IMPORTED_LOCATION)
