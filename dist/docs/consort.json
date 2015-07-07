@@ -368,7 +368,14 @@
         "title": "CONSORT_QT5_LOCATIONS"
     },
     {
-        "content": "<p><code>co_enable_qt5(module module...)</code></p>\n<p>Find and enable support for Qt5. You should specify the Qt modules you\n want (in addition to Core). For example</p>\n<p><code>co_enable_qt5(Gui Widgets)</code></p>\n<p>will find QtCore, QtGui and QtWidgets. Libraries can then be linked to targets\n through the use of the <a href=\"#/CONSORT_COMMON_GROUPS\">qt-modules</a> group.</p>\n<p>Consort will automatically copy or symlink Qt binaries into the build (bin)\n directory to ensure that Qt programs can be launched directly from the build\n output. Consort also sets <a href=\"http://www.cmake.org/cmake/help/v3.3/variable/CMAKE_AUTORCC.html\">CMAKE_AUTORCC</a>\n to enable automatic compilation of resources.</p>\n<p>If Qt is found, the <code>QT_FOUND</code> and <code>QT5_FOUND</code> flags will be set to 1.</p>",
+        "content": "<p>Set to the root directory of Qt. Consort expects to find the Qt5 CMake files\n in ${QT_ROOT}/lib/cmake. If this is not set, Consort will set it to the\n location it finds Qt in.</p>",
+        "path": [
+            "QT_ROOT"
+        ],
+        "title": "QT_ROOT"
+    },
+    {
+        "content": "<p><code>co_enable_qt5(module module...)</code></p>\n<p>Find and enable support for Qt5. You should specify the Qt modules you\n want (in addition to Core). For example</p>\n<p><code>co_enable_qt5(Gui Widgets)</code></p>\n<p>will find QtCore, QtGui and QtWidgets. Libraries can then be linked to targets\n through the use of the <a href=\"#/CONSORT_COMMON_GROUPS\">qt-modules</a> group.</p>\n<p>Consort will search the paths in <a href=\"#/CONSORT_QT5_LOCATIONS\">qt-CONSORT_QT5_LOCATIONS</a>\n for Qt by default, you can modify the list of search paths or manually\n specify <a href=\"#/QT_ROOT\">QT_ROOT</a>.</p>\n<p>Consort will automatically copy or symlink Qt binaries into the build (bin)\n directory to ensure that Qt programs can be launched directly from the build\n output. Consort also sets <a href=\"http://www.cmake.org/cmake/help/v3.3/variable/CMAKE_AUTORCC.html\">CMAKE_AUTORCC</a>\n to enable automatic compilation of resources.</p>\n<p>If Qt is found, the <code>QT_FOUND</code> and <code>QT5_FOUND</code> flags will be set to 1.</p>",
         "path": [
             "Externals",
             "co_enable_qt5"

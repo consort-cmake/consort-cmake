@@ -37,6 +37,11 @@ if(CONSORT_LINUX OR CONSORT_MACOSX)
 	)
 endif()
 
+## QT_ROOT
+# Set to the root directory of Qt. Consort expects to find the Qt5 CMake files
+# in ${QT_ROOT}/lib/cmake. If this is not set, Consort will set it to the
+# location it finds Qt in.
+
 ## Externals/co_enable_qt5
 # ```
 # co_enable_qt5(module module...)
@@ -51,6 +56,10 @@ endif()
 #
 # will find QtCore, QtGui and QtWidgets. Libraries can then be linked to targets
 # through the use of the [qt-modules](#/CONSORT_COMMON_GROUPS) group.
+#
+# Consort will search the paths in [qt-CONSORT_QT5_LOCATIONS](#/CONSORT_QT5_LOCATIONS)
+# for Qt by default, you can modify the list of search paths or manually
+# specify [QT_ROOT](#/QT_ROOT).
 #
 # Consort will automatically copy or symlink Qt binaries into the build (bin)
 # directory to ensure that Qt programs can be launched directly from the build
