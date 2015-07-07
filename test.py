@@ -66,3 +66,7 @@ print(
         len(failed),', '.join(failed)
     )
 )
+
+if len(failed) > 0:
+    sys.exit(1)
+
