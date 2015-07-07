@@ -176,7 +176,7 @@ macro(co_enable_qt5)
 				# Clang seems to be generating warnings from Qt headers, even though
 				# -isystem is used
 				foreach(m Core ${_modules})
-					list(APPEND CONSORT_COMPILE_FLAGS -isystem-prefix "Qt${m}/")
+					list(APPEND CONSORT_COMPILE_FLAGS "-isystem-prefix=Qt${m}/")
 				endforeach()
 			endif()
 
