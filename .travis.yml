@@ -21,4 +21,4 @@ compiler:
   - clang
   - gcc
 
-script: python test.py --work_dir /tmp/consort-cmake -D CONSORT_PERMIT_NFS_BUILDS=ON -D QT_ROOT=/usr -D QT_LIBRARYDIR=/usr/lib/x86_64-linux-gnu
+script: python test.py --work_dir /tmp/consort-cmake -D CONSORT_PERMIT_NFS_BUILDS=ON -D CONSORT_PERMIT_SYSTEM_BOOST=ON -D QT_ROOT=/usr -D QT_LIBRARYDIR=/usr/lib/x86_64-linux-gnu

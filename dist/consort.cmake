@@ -104,7 +104,7 @@ include_directories(${CMAKE_SOURCE_DIR})
 
 ## Variables/CONSORT_VERSION
 # Contains the current version of Consort
-set(CONSORT_VERSION 0.1.4)
+set(CONSORT_VERSION 0.1.5)
 # 32/64 bit detection
 ## Variables/CONSORT_64BIT
 # This variable is 1 if `sizeof(void*) >= 8`.
@@ -1962,6 +1962,11 @@ if(CONSORT_LINUX OR CONSORT_MACOSX)
 	)
 endif()
 
+## CONSORT_PERMIT_SYSTEM_BOOST
+# Set to ON to allow Consort to find boost in the system include directories. By
+# default Consort does not find the system boost to allow you build against a
+# stable and consistent external version of boost.
+
 ## Externals/co_enable_boost
 #
 # ```
@@ -2002,7 +2007,11 @@ macro(co_enable_boost version)
 	endif()
 
 	# Avoid finding the system version of boost
-	set(Boost_NO_SYSTEM_PATHS ON)
+	if(CONSORT_PERMIT_SYSTEM_BOOST)
+		set(Boost_NO_SYSTEM_PATHS OFF)
+	else()
+		set(Boost_NO_SYSTEM_PATHS ON)
+	endif()
 
 	find_package(Boost ${version} REQUIRED COMPONENTS ${ARGN})
 

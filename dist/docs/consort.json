@@ -8,6 +8,13 @@
         "title": "CONSORT_BOOST_LOCATIONS"
     },
     {
+        "content": "<p>Set to ON to allow Consort to find boost in the system include directories. By\n default Consort does not find the system boost to allow you build against a\n stable and consistent external version of boost.</p>",
+        "path": [
+            "CONSORT_PERMIT_SYSTEM_BOOST"
+        ],
+        "title": "CONSORT_PERMIT_SYSTEM_BOOST"
+    },
+    {
         "content": "<p><code>co_enable_boost(version component component...)</code></p>\n<p>Enable support for Boost, you should specify the version of boost you are\n developing against and a list of boost libraries to find.</p>\n<p>Consort searches the paths in <a href=\"#/CONSORT_BOOST_LOCATIONS\">CONSORT_BOOST_LOCATIONS</a>\n for the specified boost version and libraries. Consort will not search system\n paths and will look for static libraries. Consort:</p>\n<ul>\n<li>Adds the boost include directory to the list of global include directories.</li>\n<li>Enables boost filesystem V3 (<code>-DBOOST_FILESYSTEM_VERSION=3</code>).</li>\n<li>Disables autolinking on windows (<code>-DBOOST_ALL_NO_LIB</code>).</li>\n</ul>\n<p>Where necessary Consort will sanitise boost library names to make linking to\n boost as painless as possible.</p>",
         "path": [
             "Externals",

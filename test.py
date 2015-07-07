@@ -56,7 +56,7 @@ for f in dirs:
             error('example {} failed configure: {}'.format(f,rv))
             failed.append(f)
         else:
-            rv = call(['cmake','--build','.'], cwd=build_dir)
+            rv = call(['cmake','--build','.','--','VERBOSE=1'], cwd=build_dir)
             if rv != 0:
                 error('example {} failed build: {}'.format(f,rv))
                 failed.append(f)
