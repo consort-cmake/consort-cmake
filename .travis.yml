@@ -1,24 +1,15 @@
 language: cpp
 
-os:
-  - linux
-  - osx
-
 install:
-  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
-         wget http://www.cmake.org/files/v3.2/cmake-3.2.3-Linux-i386.tar.gz
-      && tar -xzf cmake-3.2.3-Linux-i386.tar.gz
-      && sudo cp -fR cmake-3.2.3-Linux-i386/* /usr
-      ;
-    else
-         brew update
-      && brew unlink cmake
-      && brew install cmake
-      ;
-    fi
+  -    wget http://www.cmake.org/files/v3.2/cmake-3.2.3-Linux-i386.tar.gz
+    && tar -xzf cmake-3.2.3-Linux-i386.tar.gz
+    && sudo cp -fR cmake-3.2.3-Linux-i386/* /usr
+    && hash -r
+    && which cmake
+    && cmake --version
 
 compiler:
   - clang
   - gcc
 
-script: python test.py
+script: pwd && which cmake && cmake --version && python test.py
