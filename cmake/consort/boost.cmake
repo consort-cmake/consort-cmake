@@ -111,21 +111,21 @@ macro(co_enable_boost version)
 		endif()
 	endforeach()
 
-	# Prefer static libraries - you probably want to develop against a version
-	# of boost specific to your compiler, platform and application - statically
-	# linking it in is the best way to avoid DLL hell and related issues.
-	set(Boost_USE_STATIC_LIBS   ON)
-
 	# The default layout type on Linux doesn't include the multi-threaded suffix
 	if( UNIX AND NOT APPLE )
 		set(Boost_USE_MULTITHREADED OFF)
 	endif()
 
-	# Avoid finding the system version of boost
 	if(CONSORT_PERMIT_SYSTEM_BOOST)
 		set(Boost_NO_SYSTEM_PATHS OFF)
 	else()
+		# Avoid finding the system version of boost
 		set(Boost_NO_SYSTEM_PATHS ON)
+
+		# Prefer static libraries - you probably want to develop against a version
+		# of boost specific to your compiler, platform and application - statically
+		# linking it in is the best way to avoid DLL hell and related issues.
+		set(Boost_USE_STATIC_LIBS   ON)
 	endif()
 
 	find_package(Boost ${version} REQUIRED COMPONENTS ${ARGN})
