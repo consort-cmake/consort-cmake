@@ -1,15 +1,16 @@
 language: cpp
 
+env:
+  - CMAKE_VERSION=3.2 CMAKE_REV=3
+  - CMAKE_VERSION=3.1 CMAKE_REV=3
+
 install:
-  -    wget http://www.cmake.org/files/v3.2/cmake-3.2.3-Linux-i386.tar.gz
-    && tar -xzf cmake-3.2.3-Linux-i386.tar.gz
-    && sudo cp -fR cmake-3.2.3-Linux-i386/* /usr
-    && hash -r
-    && which cmake
+  -    wget http://www.cmake.org/files/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}.${CMAKE_REV}-Linux-x86_64.sh
+    && sudo sh cmake-${CMAKE_VERSION}.${CMAKE_REV}-Linux-x86_64.sh --skip-license --prefix=/usr
     && cmake --version
 
 compiler:
   - clang
   - gcc
 
-script: pwd && which cmake && cmake --version && python test.py
+script: python test.py
