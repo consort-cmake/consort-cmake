@@ -20,7 +20,7 @@ parser.add_argument('-D', dest='defs', nargs=1,
     help='add a CMake define')
 
 args = parser.parse_args()
-args.defs = ['-D'+d[0] for d in args.defs]
+args.defs = ['-D'+d[0] for d in args.defs] if args.defs else []
 
 def error(*objs):
     print("ERROR: ", *objs, file=sys.stderr)
