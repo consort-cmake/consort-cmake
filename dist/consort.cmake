@@ -104,7 +104,7 @@ include_directories(${CMAKE_SOURCE_DIR})
 
 ## Variables/CONSORT_VERSION
 # Contains the current version of Consort
-set(CONSORT_VERSION 0.1.6)
+set(CONSORT_VERSION 0.1.7)
 # 32/64 bit detection
 ## Variables/CONSORT_64BIT
 # This variable is 1 if `sizeof(void*) >= 8`.
@@ -1996,21 +1996,21 @@ macro(co_enable_boost version)
 		endif()
 	endforeach()
 
-	# Prefer static libraries - you probably want to develop against a version
-	# of boost specific to your compiler, platform and application - statically
-	# linking it in is the best way to avoid DLL hell and related issues.
-	set(Boost_USE_STATIC_LIBS   ON)
-
 	# The default layout type on Linux doesn't include the multi-threaded suffix
 	if( UNIX AND NOT APPLE )
 		set(Boost_USE_MULTITHREADED OFF)
 	endif()
 
-	# Avoid finding the system version of boost
 	if(CONSORT_PERMIT_SYSTEM_BOOST)
 		set(Boost_NO_SYSTEM_PATHS OFF)
 	else()
+		# Avoid finding the system version of boost
 		set(Boost_NO_SYSTEM_PATHS ON)
+
+		# Prefer static libraries - you probably want to develop against a version
+		# of boost specific to your compiler, platform and application - statically
+		# linking it in is the best way to avoid DLL hell and related issues.
+		set(Boost_USE_STATIC_LIBS   ON)
 	endif()
 
 	find_package(Boost ${version} REQUIRED COMPONENTS ${ARGN})
@@ -2246,13 +2246,6 @@ macro(co_enable_qt5)
 			set( CMAKE_AUTORCC 1 )
 
 			message(STATUS "Qt version: ${Qt5Core_VERSION_STRING} (${QT_ROOT})")
-
-			# Qt before 5.1 didn't automatically add these
-			if( Qt5Core_VERSION_STRING VERSION_LESS "5.1" )
-				foreach(m ${_modules})
-					target_include_directories(Qt5::${m} SYSTEM BEFORE INTERFACE ${Qt5${m}_INCLUDE_DIRS})
-				endforeach()
-			endif()
 
 			if( NOT QT_TRANSLATIONS_DIR)
 				get_target_property(QT_QMAKE_EXECUTABLE Qt5::qmake IMPORTED_LOCATION)
@@ -2600,6 +2593,11 @@ endmacro()
 macro( QT_USE_MODULES )
 	foreach( m ${THIS_QT_MODULES} )
 		target_link_libraries(${name} "Qt5::${m}")
+
+		# Qt before 5.1 didn't automatically add these
+		if( Qt5Core_VERSION_STRING VERSION_LESS "5.1" )
+			target_include_directories(${name} SYSTEM BEFORE PRIVATE ${Qt5${m}_INCLUDE_DIRS})
+		endif()
 	endforeach()
 endmacro()
 
