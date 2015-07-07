@@ -13,10 +13,14 @@ root_path = path.dirname(path.abspath(__file__))
 parser = argparse.ArgumentParser(description='Run Consort tests.')
 parser.add_argument('test_cases', metavar='TEST', nargs='*', help='a test case to run')
 parser.add_argument('--work_dir', dest='work_dir', nargs=1,
-    default=root_path,
+    default=[root_path],
     help='specify directory to use for builds')
+parser.add_argument('-D', dest='defs', nargs=1,
+    action='append',
+    help='add a CMake define')
 
 args = parser.parse_args()
+args.defs = ['-D'+d[0] for d in args.defs]
 
 def error(*objs):
     print("ERROR: ", *objs, file=sys.stderr)
@@ -47,7 +51,7 @@ for f in dirs:
         else:
             makedirs(build_dir)
 
-        rv = call(['cmake',dir], cwd=build_dir)
+        rv = call(['cmake',dir]+args.defs, cwd=build_dir)
         if rv != 0:
             error('example {} failed configure: {}'.format(f,rv))
             failed.append(f)

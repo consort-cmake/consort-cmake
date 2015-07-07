@@ -20,4 +20,4 @@ compiler:
   - clang
   - gcc
 
-script: python test.py
+script: python test.py --work_dir /tmp/consort-cmake -D QT_ROOT=/usr
