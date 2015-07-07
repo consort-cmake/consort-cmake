@@ -40,6 +40,11 @@ endif()
 ## QT_ROOT
 # Set to the root directory of Qt. Consort expects to find the Qt5 CMake files
 # in ${QT_ROOT}/lib/cmake. If this is not set, Consort will set it to the
+# location it finds Qt in. See also [QT_LIBRARYDIR](#/QT_LIBRARYDIR).
+
+## QT_LIBRARYDIR
+# Set to the root directory of Qt. Consort expects to find the Qt5 CMake files
+# in ${QT_LIBRARYDIR}/cmake. If this is not set, Consort will set it to the
 # location it finds Qt in.
 
 ## Externals/co_enable_qt5
@@ -59,7 +64,8 @@ endif()
 #
 # Consort will search the paths in [qt-CONSORT_QT5_LOCATIONS](#/CONSORT_QT5_LOCATIONS)
 # for Qt by default, you can modify the list of search paths or manually
-# specify [QT_ROOT](#/QT_ROOT).
+# specify [QT_ROOT](#/QT_ROOT). You can further override where Consort will look
+# for Qt using [QT_LIBRARYDIR](#/QT_LIBRARYDIR).
 #
 # Consort will automatically copy or symlink Qt binaries into the build (bin)
 # directory to ensure that Qt programs can be launched directly from the build
@@ -110,7 +116,16 @@ macro(co_enable_qt5)
 		if( NOT EXISTS "${QT_ROOT}" )
 			message( SEND_ERROR "Qt5 directory ${QT_ROOT} does not exist" )
 		endif()
-		file( GLOB _qt_modules ${QT_ROOT}/lib/cmake/* )
+
+		if( NOT QT_LIBRARYDIR )
+			set( QT_LIBRARYDIR "${QT_ROOT}/lib" )
+		endif()
+
+		if( NOT EXISTS "${QT_LIBRARYDIR}" )
+			message( SEND_ERROR "Qt5 library directory ${QT_LIBRARYDIR} does not exist" )
+		endif()
+
+		file( GLOB _qt_modules ${QT_LIBRARYDIR}/cmake/* )
 
 		foreach( _qt_module ${_qt_modules})
 			get_filename_component(_name ${_qt_module} NAME)
