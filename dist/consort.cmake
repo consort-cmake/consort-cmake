@@ -104,7 +104,7 @@ include_directories(${CMAKE_SOURCE_DIR})
 
 ## Variables/CONSORT_VERSION
 # Contains the current version of Consort
-set(CONSORT_VERSION 0.1.5)
+set(CONSORT_VERSION 0.1.6)
 # 32/64 bit detection
 ## Variables/CONSORT_64BIT
 # This variable is 1 if `sizeof(void*) >= 8`.
@@ -2246,6 +2246,13 @@ macro(co_enable_qt5)
 			set( CMAKE_AUTORCC 1 )
 
 			message(STATUS "Qt version: ${Qt5Core_VERSION_STRING} (${QT_ROOT})")
+
+			# Qt before 5.1 didn't automatically add these
+			if( Qt5Core_VERSION_STRING VERSION_LESS "5.1" )
+				foreach(m ${_modules})
+					target_include_directories(Qt5::${m} SYSTEM BEFORE INTERFACE ${Qt5${m}_INCLUDE_DIRS})
+				endforeach()
+			endif()
 
 			if( NOT QT_TRANSLATIONS_DIR)
 				get_target_property(QT_QMAKE_EXECUTABLE Qt5::qmake IMPORTED_LOCATION)
