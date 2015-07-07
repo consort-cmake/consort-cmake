@@ -163,6 +163,13 @@ macro(co_enable_qt5)
 
 			message(STATUS "Qt version: ${Qt5Core_VERSION_STRING} (${QT_ROOT})")
 
+			# Qt before 5.1 didn't automatically add these
+			if( Qt5Core_VERSION_STRING VERSION_LESS "5.1" )
+				foreach(m ${_modules})
+					target_include_directories(Qt5::${m} SYSTEM BEFORE INTERFACE ${Qt5${m}_INCLUDE_DIRS})
+				endforeach()
+			endif()
+
 			if( NOT QT_TRANSLATIONS_DIR)
 				get_target_property(QT_QMAKE_EXECUTABLE Qt5::qmake IMPORTED_LOCATION)
 				exec_program(
