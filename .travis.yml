@@ -10,7 +10,7 @@ before_install:
   - sudo apt-get install qtbase5-dev qtdeclarative5-dev
   - sudo apt-get install qt5-default qttools5-dev qttools5-dev-tools
   - sudo apt-get install yasm
-  - sudo apt-get install libboost-dev
+  - sudo apt-get install libboost-all-dev
 
 install:
   -    wget http://www.cmake.org/files/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}.${CMAKE_REV}-Linux-x86_64.sh

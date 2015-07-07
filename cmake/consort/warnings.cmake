@@ -88,7 +88,6 @@ if( CONSORT_GCC OR CONSORT_CLANG )
 		)
 		list(APPEND CONSORT_STRICT_WARNING_FLAGS
 			-Wconversion
-			-Wno-unused-local-typedefs
 		)
 	endif()
 
@@ -118,6 +117,12 @@ if( CONSORT_GCC OR CONSORT_CLANG )
 	if(CONSORT_GCC_46)
 		list(APPEND CONSORT_SOFT_WARNING_FLAGS
 			-Wno-unused-but-set-variable
+		)
+	endif()
+
+	if(CONSORT_GCC_48)
+		list(APPEND CONSORT_STRICT_WARNING_FLAGS
+			-Wno-unused-local-typedefs
 		)
 	endif()
 
