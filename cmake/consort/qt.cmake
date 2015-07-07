@@ -176,8 +176,8 @@ macro(co_enable_qt5)
 				# Clang seems to be generating warnings from Qt headers, even though
 				# -isystem is used
 				find_path(_qt_include_dir QtCore PATHS ${Qt5Core_INCLUDE_DIRS} NO_DEFAULT_PATH)
-				get_filename_component(_qt_prefix "${_qt_include_dir}/.." ABSOLUTE)
-				list(APPEND CONSORT_COMPILE_FLAGS "-isystem-prefix" ${_qt_prefix})
+				get_filename_component(_qt_include_dir "${_qt_include_dir}/.." ABSOLUTE)
+				list(APPEND Qt5Core_INCLUDE_DIRS ${_qt_include_dir})
 			endif()
 
 			if( NOT QT_TRANSLATIONS_DIR)
