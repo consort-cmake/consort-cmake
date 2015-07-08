@@ -1,6 +1,6 @@
 os: unstable
 
-version: {build}
+version: "{build}"
 
 platform:
   - x64
