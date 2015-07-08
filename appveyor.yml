@@ -1,13 +1,9 @@
 os: unstable
 
+version: {build}
+
 platform:
-  - x86
   - x64
 
 build_script:
-  - dir c:\Libraries\boost
-  - dir c:\Libraries\boost\libs
-  - dir c:\Libraries\boost\lib32-msvc-12.0
-  - dir c:\Libraries\boost\lib64-msvc-12.0
-  - set
-  - python test.py -D BOOST_ROOT=c:/Libraries/boost -D BOOST_LIBRARYDIR=c:/Libraries/boost/lib64-msvc-12.0 -D CONSORT_PERMIT_SYSTEM_BOOST=ON
+  - python test.py -D BOOST_ROOT=c:/Libraries/boost -D BOOST_LIBRARYDIR=c:/Libraries/boost/lib64-msvc-12.0
