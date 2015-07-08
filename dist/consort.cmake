@@ -104,7 +104,7 @@ include_directories(${CMAKE_SOURCE_DIR})
 
 ## Variables/CONSORT_VERSION
 # Contains the current version of Consort
-set(CONSORT_VERSION 0.1.9)
+set(CONSORT_VERSION 0.1.10)
 # 32/64 bit detection
 ## Variables/CONSORT_64BIT
 # This variable is 1 if `sizeof(void*) >= 8`.
@@ -561,16 +561,19 @@ endfunction()
 # Useful for manipulating CMake variables that contain command line flags, but
 # do not separate them into a standard CMake List.
 function(co_add_flags var)
-	co_split(_flags " " "${${var}}")
-	list(LENGTH _flags _n)
-	if( _n GREATER 0 )
-		list(REMOVE_ITEM _flags ${ARGN})
+	set(_args ${ARGN})
+	if(_args)
+		co_split(_flags " " "${${var}}")
+		list(LENGTH _flags _n)
+		if( _n GREATER 0 )
+			list(REMOVE_ITEM _flags ${ARGN})
+		endif()
+
+		list(APPEND _flags ${ARGN})
+
+		co_join(_flags " " ${_flags})
+		set( ${var} "${_flags}" PARENT_SCOPE )
 	endif()
-
-	list(APPEND _flags ${ARGN})
-
-	co_join(_flags " " ${_flags})
-	set( ${var} "${_flags}" PARENT_SCOPE )
 endfunction()
 
 ## Utilities/co_replace_flags
@@ -2182,29 +2185,35 @@ endif()
 # If Qt is found, the `QT_FOUND` and `QT5_FOUND` flags will be set to 1.
 macro(co_enable_qt5)
 	if(NOT QT_ROOT)
-		if(CONSORT_GCC AND CONSORT_64BIT)
-			set(_qt_suffix gcc_64)
-		elseif(CONSORT_GCC)
+		if(CONSORT_GCC)
 			set(_qt_suffix gcc)
-		elseif(CONSORT_CLANG AND CONSORT_64BIT)
-			set(_qt_suffix clang_64)
 		elseif(CONSORT_CLANG)
 			set(_qt_suffix clang)
-		elseif(CONSORT_MSVC2013)
+		elseif(CONSORT_MSVC_2013)
 			set(_qt_suffix msvc2013)
-		elseif(CONSORT_MSVC2012)
+		elseif(CONSORT_MSVC_2012)
 			set(_qt_suffix msvc2012)
-		elseif(CONSORT_MSVC2010)
+		elseif(CONSORT_MSVC_2010)
 			set(_qt_suffix msvc2010)
 		else()
-			set(_qt_suffix *)
+			set(_qt_suffix "")
 			message(SEND_ERROR "Compiler not supported by co_enable_qt.")
+			co_debug(CMAKE_CXX_COMPILER_ID)
+			co_debug(CMAKE_CXX_COMPILER_VERSION)
+		endif()
+
+		if(CONSORT_64BIT)
+			if(_qt_suffix)
+				set(_qt_suffix "${_qt_suffix}_64")
+			else()
+				set(_qt_suffix "*_64")
+			endif()
 		endif()
 
 		set(_search_dirs)
 		foreach(_dir ${CONSORT_QT5_LOCATIONS})
 			if(EXISTS "${_dir}")
-				file( GLOB _dirs "${_dir}/5.*/${_qt_suffix}")
+				file( GLOB _dirs "${_dir}/5.*/${_qt_suffix}*")
 				list( SORT _dirs )
 				list( REVERSE _dirs )
 				list(APPEND _search_dirs ${_dirs})
