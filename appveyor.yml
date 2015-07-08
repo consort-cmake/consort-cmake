@@ -9,4 +9,4 @@ environment:
   - PlatformToolset: v120
 
 build_script:
-  - python build.py
+  - python test.py
