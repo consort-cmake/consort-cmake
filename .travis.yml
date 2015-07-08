@@ -14,11 +14,9 @@ before_install:
 install:
   -    wget http://www.cmake.org/files/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}.${CMAKE_REV}-Linux-x86_64.sh
     && sudo sh cmake-${CMAKE_VERSION}.${CMAKE_REV}-Linux-x86_64.sh --skip-license --prefix=/usr
-    && cmake --version
-    && ls /opt/qt54 /opt/qt54/lib
 
 compiler:
   - clang
   - gcc
 
-script: python test.py --work_dir /tmp/consort-cmake -D CONSORT_PERMIT_NFS_BUILDS=ON -D CONSORT_PERMIT_SYSTEM_BOOST=ON -D QT_ROOT=/opt/qt54
+script: python test.py -D CONSORT_PERMIT_NFS_BUILDS=ON -D CONSORT_PERMIT_SYSTEM_BOOST=ON -D QT_ROOT=/opt/qt54
