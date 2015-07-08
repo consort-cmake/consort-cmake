@@ -104,7 +104,7 @@ include_directories(${CMAKE_SOURCE_DIR})
 
 ## Variables/CONSORT_VERSION
 # Contains the current version of Consort
-set(CONSORT_VERSION 0.1.8)
+set(CONSORT_VERSION 0.1.9)
 # 32/64 bit detection
 ## Variables/CONSORT_64BIT
 # This variable is 1 if `sizeof(void*) >= 8`.
@@ -537,12 +537,15 @@ endfunction()
 # Useful for manipulating CMake variables that contain command line flags, but
 # do not separate them into a standard CMake List.
 function( co_remove_flags var )
-	co_split(_flags " " "${${var}}")
-	list(LENGTH _flags _n)
-	if( _n GREATER 0 )
-		list(REMOVE_ITEM _flags ${ARGN})
-		co_join(_flags " " ${_flags})
-		set( ${var} "${_flags}" PARENT_SCOPE )
+	set(_args ${ARGN})
+	if(_args)
+		co_split(_flags " " "${${var}}")
+		list(LENGTH _flags _n)
+		if( _n GREATER 0 )
+			list(REMOVE_ITEM _flags ${ARGN})
+			co_join(_flags " " ${_flags})
+			set( ${var} "${_flags}" PARENT_SCOPE )
+		endif()
 	endif()
 endfunction()
 
