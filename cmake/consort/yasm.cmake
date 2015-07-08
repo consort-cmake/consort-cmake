@@ -1,5 +1,16 @@
 if(CONSORT_ENABLE_ASM)
-	enable_language(ASM_YASM)
+	# enable_language generates an error if yasm is not found, but we want it to
+	# be optional in some circumstances
+	if(NOT CMAKE_ASM_YASM_COMPILER)
+		find_program(CMAKE_ASM_YASM_COMPILER yasm
+			HINTS $ENV{YASM_ROOT} "$ENV{ProgramFiles}/YASM" ${YASM_ROOT}
+			PATH_SUFFIXES bin
+		)
+	endif()
+
+	if(CMAKE_ASM_YASM_COMPILER)
+		enable_language(ASM_YASM)
+	endif()
 
 	if(CONSORT_REQUIRE_ASM AND NOT CMAKE_ASM_YASM_COMPILER_WORKS)
 		message(SEND_ERROR "Assembler not found, but CONSORT_REQUIRE_ASM is set.")
