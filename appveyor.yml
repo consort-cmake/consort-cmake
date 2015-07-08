@@ -1,6 +1,8 @@
+os: unstable
+
 platform:
   - x86
   - x64
 
 build_script:
-  - python test.py
+  - python test.py -D BOOST_ROOT=c:/Libraries/boost

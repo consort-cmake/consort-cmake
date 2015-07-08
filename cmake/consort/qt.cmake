@@ -92,6 +92,8 @@ macro(co_enable_qt5)
 		else()
 			set(_qt_suffix *)
 			message(SEND_ERROR "Compiler not supported by co_enable_qt.")
+			co_debug(CMAKE_CXX_COMPILER_ID)
+			co_debug(CMAKE_CXX_COMPILER_VERSION)
 		endif()
 
 		set(_search_dirs)
