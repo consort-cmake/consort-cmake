@@ -5,10 +5,9 @@ env:
   - CMAKE_VERSION=3.1 CMAKE_REV=3
 
 before_install:
-  - sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa
+  - sudo add-apt-repository --yes ppa:beineri/opt-qt541
   - sudo apt-get update -qq
-  - sudo apt-get install qtbase5-dev qtdeclarative5-dev
-  - sudo apt-get install qt5-default qttools5-dev qttools5-dev-tools
+  - sudo apt-get install qt54base qt54declarative qt54tools
   - sudo apt-get install yasm
   - sudo apt-get install libboost-all-dev
 
@@ -16,9 +15,10 @@ install:
   -    wget http://www.cmake.org/files/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}.${CMAKE_REV}-Linux-x86_64.sh
     && sudo sh cmake-${CMAKE_VERSION}.${CMAKE_REV}-Linux-x86_64.sh --skip-license --prefix=/usr
     && cmake --version
+    && ls /opt/qt54 /opt/qt54/lib
 
 compiler:
   - clang
   - gcc
 
-script: python test.py --work_dir /tmp/consort-cmake -D CONSORT_PERMIT_NFS_BUILDS=ON -D CONSORT_PERMIT_SYSTEM_BOOST=ON -D QT_ROOT=/usr -D QT_LIBRARYDIR=/usr/lib/x86_64-linux-gnu
+script: python test.py --work_dir /tmp/consort-cmake -D CONSORT_PERMIT_NFS_BUILDS=ON -D CONSORT_PERMIT_SYSTEM_BOOST=ON -D QT_ROOT=/opt/qt54
