@@ -104,7 +104,7 @@ include_directories(${CMAKE_SOURCE_DIR})
 
 ## Variables/CONSORT_VERSION
 # Contains the current version of Consort
-set(CONSORT_VERSION 0.1.7)
+set(CONSORT_VERSION 0.1.8)
 # 32/64 bit detection
 ## Variables/CONSORT_64BIT
 # This variable is 1 if `sizeof(void*) >= 8`.
@@ -597,7 +597,18 @@ function( co_replace_flag var old_flag new_flag )
 endfunction()
 
 if(CONSORT_ENABLE_ASM)
-	enable_language(ASM_YASM)
+	# enable_language generates an error if yasm is not found, but we want it to
+	# be optional in some circumstances
+	if(NOT CMAKE_ASM_YASM_COMPILER)
+		find_program(CMAKE_ASM_YASM_COMPILER yasm
+			HINTS $ENV{YASM_ROOT} "$ENV{ProgramFiles}/YASM" ${YASM_ROOT}
+			PATH_SUFFIXES bin
+		)
+	endif()
+
+	if(CMAKE_ASM_YASM_COMPILER)
+		enable_language(ASM_YASM)
+	endif()
 
 	if(CONSORT_REQUIRE_ASM AND NOT CMAKE_ASM_YASM_COMPILER_WORKS)
 		message(SEND_ERROR "Assembler not found, but CONSORT_REQUIRE_ASM is set.")
@@ -756,7 +767,6 @@ if( CONSORT_GCC OR CONSORT_CLANG )
 		)
 		list(APPEND CONSORT_STRICT_WARNING_FLAGS
 			-Wconversion
-			-Wno-unused-local-typedefs
 		)
 	endif()
 
@@ -786,6 +796,12 @@ if( CONSORT_GCC OR CONSORT_CLANG )
 	if(CONSORT_GCC_46)
 		list(APPEND CONSORT_SOFT_WARNING_FLAGS
 			-Wno-unused-but-set-variable
+		)
+	endif()
+
+	if(CONSORT_GCC_48)
+		list(APPEND CONSORT_STRICT_WARNING_FLAGS
+			-Wno-unused-local-typedefs
 		)
 	endif()
 
@@ -2017,8 +2033,6 @@ macro(co_enable_boost version)
 		set(Boost_USE_STATIC_LIBS   ON)
 	endif()
 
-	set(Boost_DEBUG ON)
-
 	find_package(Boost ${version} REQUIRED COMPONENTS ${ARGN})
 
 	if(NOT Boost_FOUND)
@@ -2252,6 +2266,15 @@ macro(co_enable_qt5)
 			set( CMAKE_AUTORCC 1 )
 
 			message(STATUS "Qt version: ${Qt5Core_VERSION_STRING} (${QT_ROOT})")
+
+			# Some versions of Qt reference invalid include directories
+			foreach(m Core ${_modules})
+				foreach(d ${Qt5${m}_INCLUDE_DIRS})
+					if(NOT IS_DIRECTORY "${d}")
+						list(REMOVE_ITEM Qt5${m}_INCLUDE_DIRS "${d}")
+					endif()
+				endforeach()
+			endforeach()
 
 			if( NOT QT_TRANSLATIONS_DIR)
 				get_target_property(QT_QMAKE_EXECUTABLE Qt5::qmake IMPORTED_LOCATION)
