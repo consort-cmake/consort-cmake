@@ -1,0 +1,12 @@
+platform:
+  - x86
+  - x64
+
+environment:
+  matrix:
+  - PlatformToolset: v100
+  - PlatformToolset: v110
+  - PlatformToolset: v120
+
+build_script:
+  - python build.py
