@@ -80,16 +80,19 @@ endfunction()
 # Useful for manipulating CMake variables that contain command line flags, but
 # do not separate them into a standard CMake List.
 function(co_add_flags var)
-	co_split(_flags " " "${${var}}")
-	list(LENGTH _flags _n)
-	if( _n GREATER 0 )
-		list(REMOVE_ITEM _flags ${ARGN})
+	set(_args ${ARGN})
+	if(_args)
+		co_split(_flags " " "${${var}}")
+		list(LENGTH _flags _n)
+		if( _n GREATER 0 )
+			list(REMOVE_ITEM _flags ${ARGN})
+		endif()
+
+		list(APPEND _flags ${ARGN})
+
+		co_join(_flags " " ${_flags})
+		set( ${var} "${_flags}" PARENT_SCOPE )
 	endif()
-
-	list(APPEND _flags ${ARGN})
-
-	co_join(_flags " " ${_flags})
-	set( ${var} "${_flags}" PARENT_SCOPE )
 endfunction()
 
 ## Utilities/co_replace_flags
