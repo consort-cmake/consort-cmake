@@ -10,6 +10,7 @@
     {
         "content": "<p>Set to ON to allow Consort to find boost in the system include directories. By\n default Consort does not find the system boost to allow you build against a\n stable and consistent external version of boost.</p>",
         "path": [
+            "Externals",
             "CONSORT_PERMIT_SYSTEM_BOOST"
         ],
         "title": "CONSORT_PERMIT_SYSTEM_BOOST"
@@ -377,6 +378,7 @@
     {
         "content": "<p>Set to the root directory of Qt. Consort expects to find the Qt5 CMake files\n in ${QT_ROOT}/lib/cmake. If this is not set, Consort will set it to the\n location it finds Qt in. See also <a href=\"#/QT_LIBRARYDIR\">QT_LIBRARYDIR</a>.</p>",
         "path": [
+            "Externals",
             "QT_ROOT"
         ],
         "title": "QT_ROOT"
@@ -384,6 +386,7 @@
     {
         "content": "<p>Set to the root directory of Qt. Consort expects to find the Qt5 CMake files\n in ${QT_LIBRARYDIR}/cmake. If this is not set, Consort will set it to the\n location it finds Qt in.</p>",
         "path": [
+            "Externals",
             "QT_LIBRARYDIR"
         ],
         "title": "QT_LIBRARYDIR"

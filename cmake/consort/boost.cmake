@@ -77,7 +77,7 @@ if(CONSORT_LINUX OR CONSORT_MACOSX)
 	)
 endif()
 
-## CONSORT_PERMIT_SYSTEM_BOOST
+## Externals/CONSORT_PERMIT_SYSTEM_BOOST
 # Set to ON to allow Consort to find boost in the system include directories. By
 # default Consort does not find the system boost to allow you build against a
 # stable and consistent external version of boost.

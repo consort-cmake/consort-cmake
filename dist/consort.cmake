@@ -1982,7 +1982,7 @@ if(CONSORT_LINUX OR CONSORT_MACOSX)
 	)
 endif()
 
-## CONSORT_PERMIT_SYSTEM_BOOST
+## Externals/CONSORT_PERMIT_SYSTEM_BOOST
 # Set to ON to allow Consort to find boost in the system include directories. By
 # default Consort does not find the system boost to allow you build against a
 # stable and consistent external version of boost.
@@ -2141,12 +2141,12 @@ if(CONSORT_LINUX OR CONSORT_MACOSX)
 	)
 endif()
 
-## QT_ROOT
+## Externals/QT_ROOT
 # Set to the root directory of Qt. Consort expects to find the Qt5 CMake files
 # in ${QT_ROOT}/lib/cmake. If this is not set, Consort will set it to the
 # location it finds Qt in. See also [QT_LIBRARYDIR](#/QT_LIBRARYDIR).
 
-## QT_LIBRARYDIR
+## Externals/QT_LIBRARYDIR
 # Set to the root directory of Qt. Consort expects to find the Qt5 CMake files
 # in ${QT_LIBRARYDIR}/cmake. If this is not set, Consort will set it to the
 # location it finds Qt in.
