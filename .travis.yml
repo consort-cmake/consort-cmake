@@ -19,4 +19,4 @@ compiler:
   - clang
   - gcc
 
-script: python test.py -D CONSORT_PERMIT_NFS_BUILDS=ON -D CONSORT_PERMIT_SYSTEM_BOOST=ON -D QT_ROOT=/opt/qt54
+script: python test.py -D CONSORT_PERMIT_SYSTEM_BOOST=ON -D QT_ROOT=/opt/qt54

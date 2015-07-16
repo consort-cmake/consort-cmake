@@ -47,7 +47,7 @@ if( CMAKE_HOST_UNIX )
 			OUTPUT_STRIP_TRAILING_WHITESPACE
 		)
 
-		if(NOT _result STREQUAL "nfs")
+		if(_result STREQUAL "nfs")
 			set(_nfs_build 1)
 		endif()
 	endif()
