@@ -3,7 +3,7 @@
 # co_safe_glob( output_var glob glob ...)
 # ```
 #
-# Expand file globs into output_var, generating an error if any glob files to
+# Expand file globs into output_var, generating an error if any glob fails to
 # expand to any files. Analogous to `file(GLOB ${var} ${ARGN})` but with a
 # sanity check to ensure each glob matches at least one file.
 #
